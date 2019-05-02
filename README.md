@@ -32,16 +32,16 @@ Aufbau der Architektur:
 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JacobNr16/TRASIMOS_Team3/master/Resources/TRASIMOS.png?token=AHZYKUI4OLRG4NWQSRQP7ZC42PWF4" alt="Architektur des Systems">
+  <img src="Resources/TRASIMOS.png" alt="Architektur des Systems">
 </p>
 
 =================================
 
 Beschreibung der Komponenten
 
-#PRIO 1
+# PRIO 1
 
-#V2 
+# V2 
 
 Methoden:
 
@@ -64,14 +64,14 @@ optional:
                         - Kollsion überprüfen 
                         - Netflix&Chill
 
-#Routen
+# Routen
 
 Nutzen der API von :                        
 
 http://141.72.191.30:5000/route/v1/driving/9.001,49.3;9.0,49.6?steps=true&alternatives=true&geometries=geojson
 
 
-#Kartenservice
+# Kartenservice
 
 Der zu verwaltete Kartenbereich ca. 10km muss verteilt dargestellt werden, damit kein Bottleneck erzeugt wird.
 
@@ -81,33 +81,33 @@ Die Karte in gleich große Stücke aufteilen (Schachbrett). Jedes Feld stellt ei
 
 Funktionen:
 
-        - Verwalten der Positionen eines V2 Cars (durch Ipublish)
-           Response -> OK, falls im verwalteten Kartenbereich
-           Response -> Falls ein V2 den verawlteten Bereich verlässt soll die Referenz auf den nächsten Kartenservice übergeben werden.
+- Verwalten der Positionen eines V2 Cars (durch Ipublish)
+      Response -> OK, falls im verwalteten Kartenbereich
+      Response -> Falls ein V2 den verawlteten Bereich verlässt soll die Referenz auf den nächsten Kartenservice übergeben werden.
         
-        - GetNeighbours liefern alle Autos in einem bestimmten Umkreis, ggf Anfragen bei anderen Kartenservices
-            Ggf. geht Kommunikation vom Service aus -> Nur falls eine Änderung stattfindet
+- GetNeighbours liefern alle Autos in einem bestimmten Umkreis, ggf Anfragen bei anderen Kartenservices
+      Ggf. geht Kommunikation vom Service aus -> Nur falls eine Änderung stattfindet
             
-        - GetCars liefert alle Positionen der verwalteten Autos zurück (ggf inkl. Himmelsrichtung) zur Visiualisierung im WebServer
+- GetCars liefert alle Positionen der verwalteten Autos zurück (ggf inkl. Himmelsrichtung) zur Visiualisierung im WebServer
         
         
-#Prio 2 
+# Prio 2 
         
-#WebServer       
+# WebServer       
 
 visualisiert die Positionen der Autos auf einer Karte, fragt alle Kartenservices / oder V2 nach Positionen an         
         
 
-#Kartendienst
+# Kartendienst
 
 Der Tile Server kann unter der Adresse http://141.72.191.30/hot7{x}/{y}/{z}.png erreicht werden.
 Hinweise Umrechnung von longitude and latitude in die Werte x,y und z finden Sie auch hier : https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Lon..2Flat._to_tile_numbers_2
                         
                   
-#Prio 3
+# Prio 3
 
                         
-#Name Service    
+# Name Service    
 
 1. Wieso Prio 3 ? -> Es wird davon ausgegangen, dass die Autos initial durch eine Factory erzeugt werden, die schon alle Kartenservices kennt.
                      der Kartenservices wäre somit ein Upgrade.
