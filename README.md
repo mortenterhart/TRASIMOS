@@ -32,7 +32,7 @@ Aufbau der Architektur:
 
 
 <p align="center">
-  <img src="https://github.com/captainblubb/SCROAChartFX/blob/master/resources/GUI.png" alt="Architektur des Systems">
+  <img src="https://raw.githubusercontent.com/JacobNr16/TRASIMOS_Team3/master/Resources/TRASIMOS.png?token=AHZYKUI4OLRG4NWQSRQP7ZC42PWF4" alt="Architektur des Systems">
 </p>
 
 =================================
