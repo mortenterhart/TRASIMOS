@@ -1,4 +1,4 @@
-package org.dhbw.mosbach.ai.trasimos;
+package org.dhbw.mosbach.ai.trasimos.servlet;
 
 import org.osgi.service.http.HttpService;
 

@@ -74,3 +74,4 @@ build/
 
 # Vim Temporary Files
 *.swp
+/bin/
