@@ -109,7 +109,7 @@ Funktionen:
 visualisiert die Positionen der Autos auf einer Karte, fragt alle Kartenservices / oder V2 nach Positionen an         
 
 # Interface         
-+GetNameService(Posi)
++ReceivePosition(Posi)
 
 # Kartendienst
 
@@ -125,7 +125,7 @@ Hinweise Umrechnung von longitude and latitude in die Werte x,y und z finden Sie
 1. Wieso Prio 3 ? -> Es wird davon ausgegangen, dass die Autos initial durch eine Factory erzeugt werden, die schon alle Kartenservices kennt.
                      der Kartenservices wäre somit ein Upgrade.
 
-Benötigt um zwischen Position eines nachträglich gespawnetem Autos auf ein Kartenservice zu vernetzen ggf. Auch bei einem Ausfall eines Kartenservices.
+Benötigt um zwischen Position eines nachträglich gespawnetem Autos auf ein Informationsservice zu vernetzen ggf. Auch bei einem Ausfall eines Kartenservices.
 
 # Interface
 +GetInformationService(Posi)
