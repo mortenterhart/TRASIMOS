@@ -99,7 +99,8 @@ Funktionen:
 +ReceivePos(Id,Posi)
 +GetNeighbours(Id,Speed)
 +Getneighbours(Posi,Radius)
-+OvertakeInformationservice(Pos,Pos,Pos,Pos) -> Übernehmen eines benachbarten NameService         
++OvertakeInformationservice(Pos,Pos,Pos,Pos) -> Übernehmen eines benachbarten NameService       
++ReceiveFinished(Id)  
         
 # Prio 2 
         
