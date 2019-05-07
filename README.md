@@ -46,7 +46,8 @@ Beschreibung der Komponenten
 Methoden:
 
 - IPublishPosition  : Übermittelt die eigene Position an den zuständigen Kartenservice
-- GetNeighbours     : Ermittelt über Anfragen am Kartenservice alle Autos in der Umgebung  
+- GetNeighbours     : Ermittelt über Anfragen am Kartenservice alle Autos in der Umgebung
+                    => Weiter Kommunikation findet direkt unter den Autos statt, in der Gruppe aller direkten Nachbarn
 
 optional:
 - GetRoute          : Ermittelt die Route um von Startposition zu Zielposition zu gelangen
@@ -62,7 +63,11 @@ optional:
                         - Geschwindigkeit anpassen
                         - Bewegen
                         - Kollsion überprüfen 
-                        - Netflix&Chill
+  
+# Interface 
++ReceivePosition(Id, Richtung, Speed )   
+                   
+                        
 
 # Routen
 
@@ -71,7 +76,7 @@ Nutzen der API von :
 http://141.72.191.30:5000/route/v1/driving/9.001,49.3;9.0,49.6?steps=true&alternatives=true&geometries=geojson
 
 
-# Kartenservice
+# Informationsservice
 
 Der zu verwaltete Kartenbereich ca. 10km muss verteilt dargestellt werden, damit kein Bottleneck erzeugt wird.
 
@@ -89,14 +94,21 @@ Funktionen:
       Ggf. geht Kommunikation vom Service aus -> Nur falls eine Änderung stattfindet
             
 - GetCars liefert alle Positionen der verwalteten Autos zurück (ggf inkl. Himmelsrichtung) zur Visiualisierung im WebServer
-        
+
+# Interface
++ReceivePos(Id,Posi)
++GetNeighbours(Id,Speed)
++Getneighbours(Posi,Radius)
++OvertakeInformationservice(Pos,Pos,Pos,Pos) -> Übernehmen eines benachbarten NameService         
         
 # Prio 2 
         
 # WebServer       
 
 visualisiert die Positionen der Autos auf einer Karte, fragt alle Kartenservices / oder V2 nach Positionen an         
-        
+
+# Interface         
++GetNameService(Posi)
 
 # Kartendienst
 
@@ -114,3 +126,5 @@ Hinweise Umrechnung von longitude and latitude in die Werte x,y und z finden Sie
 
 Benötigt um zwischen Position eines nachträglich gespawnetem Autos auf ein Kartenservice zu vernetzen ggf. Auch bei einem Ausfall eines Kartenservices.
 
+# Interface
++GetInformationService(Posi)
