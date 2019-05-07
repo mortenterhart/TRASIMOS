@@ -96,11 +96,11 @@ Funktionen:
 - GetCars liefert alle Positionen der verwalteten Autos zurück (ggf inkl. Himmelsrichtung) zur Visiualisierung im WebServer
 
 # Interface
-+ReceivePos(Id,Posi)
-+GetNeighbours(Id,Speed)
-+Getneighbours(Posi,Radius)
-+OvertakeInformationservice(Pos,Pos,Pos,Pos) -> Übernehmen eines benachbarten NameService       
-+ReceiveFinished(Id)  
+ +ReceivePos(Id,Posi)
+ +GetNeighbours(Id,Speed)
+ +Getneighbours(Posi,Radius)
+ +OvertakeInformationservice(Pos,Pos,Pos,Pos) -> Übernehmen eines benachbarten NameService       
+ +ReceiveFinished(Id)  
         
 # Prio 2 
         
