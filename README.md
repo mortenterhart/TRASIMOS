@@ -65,7 +65,7 @@ optional:
                         - Kollsion überprüfen 
   
 # Interface 
-+ReceivePosition(Id, Richtung, Speed )   
++PublishPosition(Id, Richtung, Speed )   
                    
                         
 
