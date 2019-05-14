@@ -6,5 +6,8 @@ import java.util.Vector;
 
 public interface IV2 {
 
-    void getPosition(Position position, Vector<Long> direction, double speed);
+   Position getCurrentPosition();
+   Position getDestination();
+   Position getOrigin();
+   int getId();
 }
