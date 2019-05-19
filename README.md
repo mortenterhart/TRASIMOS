@@ -1,131 +1,120 @@
-# TRASIMOS_Team3
+# TRASIMOS Team3
+
 Projektarbeit Verteilte Systeme
 
 Verwendung unter Java 11 (Es wird gesagt manche Rebellen benutzen auch Java 1.8.201)
 
-Übersicht der Systeme:
+## Übersicht der Systeme:
 
+**Prio 1:**
 
-Prio 1:
+* V2: repräsentiert ein Fahrzeug
+* Routen: repräsentiert ein Routenservice (Ggf. in V2 realisiert durch call von API)
+* Informationssystem: verwaltet ein Stück der Karte von Mosbach
 
-V2              repräsentiert ein Fahrzeug
+**Prio 2:** 
+* WebServer: visualisiert die Positionen der Autos auf einer Karte 
+* Kartendienst: stellt ein realen Kartenauschnitt als Bild dar (ggf. Google api)
 
-Routen          repräsentiert ein Routenservice (Ggf. in V2 realisiert durch call von API)
-
-Kartenservive   verwaltet ein Stück der Karte von Mosbach
-
-
-Prio 2: 
-
-WebServer       visualisiert die Positionen der Autos auf einer Karte 
-
-Kartendienst    stellt ein realen Kartenauschnitt als Bild dar (ggf. Google api)
-
-
-Prio 3: 
-
-Name Service    Benötigt um zwischen Position eines nachträglich gespawnetem Autos auf ein Kartenservice
-                zu vernetzen ggf. Auch bei einem Ausfall eines Kartenservices.
+**Prio 3:** 
+* Name Server: Benötigt um zwischen Position eines nachträglich gespawnetem Autos auf ein Kartenservice
+               zu vernetzen ggf. Auch bei einem Ausfall eines Kartenservices.
                 
-
-Aufbau der Architektur:
+## Aufbau der Architektur:
 
 
 <p align="center">
   <img src="Resources/TRASIMOS.png" alt="Architektur des Systems">
 </p>
 
-=================================
+---
 
-Beschreibung der Komponenten
+## Beschreibung der Komponenten
 
-# PRIO 1
+### PRIO 1
 
-# V2 
+#### V2 
 
-Methoden:
+**Methoden:**
+* IPublishPosition: Übermittelt die eigene Position an den zuständigen Kartenservice
+* GetNeighbours: Ermittelt über Anfragen am Kartenservice alle Autos in der Umgebung
+  * => Weiter Kommunikation findet direkt unter den Autos statt, in der Gruppe aller direkten Nachbarn
 
-- IPublishPosition  : Übermittelt die eigene Position an den zuständigen Kartenservice
-- GetNeighbours     : Ermittelt über Anfragen am Kartenservice alle Autos in der Umgebung
-                    => Weiter Kommunikation findet direkt unter den Autos statt, in der Gruppe aller direkten Nachbarn
+**optional:**
+* GetRoute: Ermittelt die Route um von Startposition zu Zielposition zu gelangen
+* Drive: Besteht aus folgenden Routinen 
 
-optional:
-- GetRoute          : Ermittelt die Route um von Startposition zu Zielposition zu gelangen
-
-- Drive             : Besteht aus folgenden Routinen 
-
-                    GetRoute
+```
+GetRoute
                     
-                    Loop:
-                        - Position publishen
-                        - Neighbours anfragen
-                        - Position der Neighbours aktualisieren
-                        - Geschwindigkeit anpassen
-                        - Bewegen
-                        - Kollsion überprüfen 
+Loop:
+- Position publishen
+- Neighbours anfragen
+- Position der Neighbours aktualisieren
+- Geschwindigkeit anpassen
+- Bewegen
+- Kollsion überprüfen
+``` 
   
-# Interface 
-+PublishPosition(Id, Richtung, Speed )   
-                   
-                        
+#### Interface 
 
-# Routen
++ PublishPosition(Id, Richtung, Speed)   
 
-Nutzen der API von :                        
+#### Routen
 
-http://141.72.191.30:5000/route/v1/driving/9.001,49.3;9.0,49.6?steps=true&alternatives=true&geometries=geojson
+Nutzen der API von:
 
+* http://141.72.191.30:5000/route/v1/driving/9.001,49.3;9.0,49.6?steps=true&alternatives=true&geometries=geojson
 
-# Informationsservice
+#### Informationsservice
 
 Der zu verwaltete Kartenbereich ca. 10km muss verteilt dargestellt werden, damit kein Bottleneck erzeugt wird.
 
-Konzeptionierung:
+**Konzeptionierung:**
 
 Die Karte in gleich große Stücke aufteilen (Schachbrett). Jedes Feld stellt einen Service dar. Jeder Service kennt alle 8 umliegenden Felder.
 
-Funktionen:
+**Funktionen:**
 
-- Verwalten der Positionen eines V2 Cars (durch Ipublish)
-      Response -> OK, falls im verwalteten Kartenbereich
-      Response -> Falls ein V2 den verawlteten Bereich verlässt soll die Referenz auf den nächsten Kartenservice übergeben werden.
-        
-- GetNeighbours liefern alle Autos in einem bestimmten Umkreis, ggf Anfragen bei anderen Kartenservices
-      Ggf. geht Kommunikation vom Service aus -> Nur falls eine Änderung stattfindet
-            
-- GetCars liefert alle Positionen der verwalteten Autos zurück (ggf inkl. Himmelsrichtung) zur Visiualisierung im WebServer
+* Verwalten der Positionen eines V2 Cars (durch Ipublish)
+   * Response -> OK, falls im verwalteten Kartenbereich
+   * Response -> Falls ein V2 den verwalteten Bereich verlässt soll die Referenz auf den nächsten Kartenservice übergeben werden.       
+* GetNeighbours liefern alle Autos in einem bestimmten Umkreis, ggf Anfragen bei anderen Kartenservices
+   * Ggf. geht Kommunikation vom Service aus -> Nur falls eine Änderung stattfindet
+* GetCars liefert alle Positionen der verwalteten Autos zurück (ggf inkl. Himmelsrichtung) zur Visiualisierung im WebServer
 
-# Interface
- +ReceivePos(Id,Posi)
- +GetNeighbours(Id,Speed)
- +Getneighbours(Posi,Radius)
- +OvertakeInformationservice(Pos,Pos,Pos,Pos) -> Übernehmen eines benachbarten NameService       
- +ReceiveFinished(Id)  
+#### Interface
+
++ ReceivePos(Id,Posi)
++ GetNeighbours(Id,Speed)
++ GetNeighbours(Posi,Radius)
++ OvertakeInformationService(Pos,Pos,Pos,Pos) -> Übernehmen eines benachbarten NameService       
++ ReceiveFinished(Id)  
+
+### Prio 2 
         
-# Prio 2 
-        
-# WebServer       
+#### Webserver       
 
 visualisiert die Positionen der Autos auf einer Karte, fragt alle Kartenservices / oder V2 nach Positionen an         
 
-# Interface         
-+ReceivePosition(Posi)
+#### Interface
+         
++ ReceivePosition(Posi)
 
-# Kartendienst
+#### Kartendienst
 
 Der Tile Server kann unter der Adresse http://141.72.191.30/hot7{x}/{y}/{z}.png erreicht werden.
 Hinweise Umrechnung von longitude and latitude in die Werte x,y und z finden Sie auch hier : https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Lon..2Flat._to_tile_numbers_2
+                                         
+### Prio 3
                         
-                  
-# Prio 3
-
-                        
-# Name Service    
+#### Name Service    
 
 1. Wieso Prio 3 ? -> Es wird davon ausgegangen, dass die Autos initial durch eine Factory erzeugt werden, die schon alle Kartenservices kennt.
                      der Kartenservices wäre somit ein Upgrade.
 
 Benötigt um zwischen Position eines nachträglich gespawnetem Autos auf ein Informationsservice zu vernetzen ggf. Auch bei einem Ausfall eines Kartenservices.
 
-# Interface
-+GetInformationService(Posi)
+#### Interface
+
++ GetInformationService(Posi)
