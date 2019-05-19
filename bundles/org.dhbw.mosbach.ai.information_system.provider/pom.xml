@@ -16,7 +16,7 @@
     <version>1.0.0</version>
     <packaging>bundle</packaging>
 
-    <name>information-system</name>
+    <name>information-system-provider</name>
     <url>http://www.mosbach.dhbw.de/angewandte-informatik.html</url>
 
     <properties>
@@ -37,10 +37,24 @@
 
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <version>4.2.0</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+
+                    </instructions>
+                </configuration>
             </plugin>
         </plugins>
     </build>

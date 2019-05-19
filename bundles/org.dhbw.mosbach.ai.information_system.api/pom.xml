@@ -16,7 +16,7 @@
     <version>1.0.0</version>
     <packaging>bundle</packaging>
 
-    <name>information-system</name>
+    <name>information-system-api</name>
     <url>http://www.mosbach.dhbw.de/angewandte-informatik.html</url>
 
     <properties>
@@ -50,6 +50,11 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <version>4.2.0</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Export-Package>org.dhbw.mosbach.ai.information_system.api, org.dhbw.mosbach.ai.information_system.api.model</Export-Package>
+                    </instructions>
+                </configuration>
             </plugin>
         </plugins>
     </build>

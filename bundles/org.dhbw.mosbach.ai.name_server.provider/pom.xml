@@ -16,7 +16,7 @@
     <version>1.0.0</version>
     <packaging>bundle</packaging>
 
-    <name>name-server</name>
+    <name>name-server-provider</name>
     <url>http://www.mosbach.dhbw.de/angewandte-informatik.html</url>
 
     <properties>
