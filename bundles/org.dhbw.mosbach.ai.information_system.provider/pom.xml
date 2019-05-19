@@ -53,7 +53,18 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-
+                        <Import-Package>
+                            org.dhbw.mosbach.ai.information_system.api;version="1.0.0",
+                            org.dhbw.mosbach.ai.information_system.api.model;version="1.0.0",
+                            org.osgi.service.component.annotations;version="1.3.0";resolution:=optional
+                        </Import-Package>
+                        <Require-Bundle>
+                            org.eclipse.osgi;bundle-version="3.13.300",
+                            org.eclipse.osgi.services;bundle-version="3.8.0"
+                        </Require-Bundle>
+                        <!-- Enable processing of OSGi DS component and metatype annotations -->
+                        <_dsannotaions>*</_dsannotaions>
+                        <_metatypeannotations>*</_metatypeannotations>
                     </instructions>
                 </configuration>
             </plugin>

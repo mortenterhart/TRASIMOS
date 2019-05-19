@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Name Server Implementation
+Bundle-Name: Name Server Implementation Provider
 Bundle-SymbolicName: org.dhbw.mosbach.ai.name_server.provider
 Bundle-Version: 1.0.0
 Automatic-Module-Name: org.dhbw.mosbach.ai.name_server.provider
