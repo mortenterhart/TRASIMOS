@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Information System Information Provider
+Bundle-SymbolicName: org.dhbw.mosbach.ai.information_system.provider
+Bundle-Version: 1.0.0
+Automatic-Module-Name: org.dhbw.mosbach.ai.information_system.provider
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Import-Package: org.dhbw.mosbach.ai.information_system.api;version="1.0.0",
+ org.dhbw.mosbach.ai.information_system.api.model;version="1.0.0",
+ org.osgi.service.component.annotations;version="1.3.0";resolution:=optional
+Service-Component: OSGI-INF/information-system.xml
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.osgi;bundle-version="3.13.300",
+ org.eclipse.osgi.services;bundle-version="3.8.0"
