@@ -30,10 +30,14 @@ public class InformationSystemImpl implements IInformationSystem, IPublishPositi
     }
 
     @Override
-    public void receivePosition(long v2Id, Position position) {
+    public boolean receivePosition(long v2Id, Position position) {
         // Add/Update vehicle in Map
         // if vehicle id already exists the position of vehicle will be overridden
-        vehiclesToObserve.put(v2Id, position);
+        if(isVehicleInBoundary(position)){
+            vehiclesToObserve.put(v2Id, position);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -50,15 +54,13 @@ public class InformationSystemImpl implements IInformationSystem, IPublishPositi
         if (isVehicleKnown(v2Id)) {
             List<Position> positionOfNeighbours = new ArrayList<>();
             // stopping distance = reaction time distance + actual stopping distance
-            double stoppingDistance = (speed / 10 * 3) + (speed / 10 * speed / 10);
             Position positionOfVehicle = vehiclesToObserve.get(v2Id);
 
             for (Position pos : vehiclesToObserve.values()) {
-                if (distanceBetweenPositions(positionOfVehicle, pos) <= stoppingDistance) {
+                if (distanceBetweenPositions(positionOfVehicle, pos) <= calcStoppingDistance(speed)) {
                     positionOfNeighbours.add(pos);
                 }
             }
-
             return positionOfNeighbours;
         }
         return null;
@@ -83,12 +85,6 @@ public class InformationSystemImpl implements IInformationSystem, IPublishPositi
         return positionOfNeighbours;
     }
 
-    @Override
-    public void overtakeInformationService(Position position00, Position position10, Position position01,
-                                           Position position11) {
-
-    }
-
     /**
      * remove vehicle from observing
      * @param v2Id id of v2 vehicle
@@ -111,5 +107,25 @@ public class InformationSystemImpl implements IInformationSystem, IPublishPositi
 
     private boolean isVehicleKnown(long vehicleId) {
         return vehiclesToObserve.containsKey(vehicleId);
+    }
+
+    private boolean isVehicleInBoundary(Position position) {
+        if (position.getLongitude() > westBound && position.getLongitude() < eastBound && position.getLatitude() < northBound && position.getLatitude() > southBound){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isVehicleNearBoundary(Position position, double speed){
+        double stoppingDistance = calcStoppingDistance(speed);
+        if(position.getLatitude() > (westBound + stoppingDistance) && position.getLatitude() < (eastBound - stoppingDistance) &&
+                position.getLatitude() < (northbound - stoppingDistance) && position.getLatitude() > (southbound + stoppingDistance)){
+            return true;
+        }
+        return false;
+    }
+
+    private double calcStoppingDistance(double speed){
+        return (speed / 10 * 3) + (speed / 10 * speed / 10);
     }
 }
