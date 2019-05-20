@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: V2 Car API
+Bundle-SymbolicName: org.dhbw.mosbach.ai.v2.api
+Bundle-Version: 1.0.0
+Automatic-Module-Name: org.dhbw.mosbach.ai.v2.api
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Export-Package: org.dhbw.mosbach.ai.v2.api;version="1.0.0",
+ org.dhbw.mosbach.ai.v2.api.model;version="1.0.0"
