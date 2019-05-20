@@ -73,6 +73,8 @@ Beschreibung der Komponenten
      -> Position an Informationsservice
      
      -> Position an Webservice
+     
+3. Auto am Ziel : InformationService -> benachrichtigen
          
 
 Methoden:
@@ -138,16 +140,23 @@ Funktionen:
 - GetCars liefert alle Positionen der verwalteten Autos zurück (ggf inkl. Himmelsrichtung) zur Visiualisierung im WebServer
 
 # Interface
- +ReceivePos(Id,Posi)
- +GetNeighbours(Id,Speed)
- +Getneighbours(Posi,Radius)
- +OvertakeInformationservice(Pos,Pos,Pos,Pos) -> Übernehmen eines benachbarten NameService       
- +ReceiveFinished(Id)  
+ +ReceivePos(Id,Posi): Response(OK || False => deregistriert + Url auf verantwortlichen Service)
+ +GetNeighbours(Id,Speed): List<V2>
+ +Getneighbours(Posi,Radius): List<V2>
+ +OvertakeInformationservice(Area) -> Übernehmen eines benachbarten InformationService       
+ +ReceiveFinished(Id) -> Car am ziel 
         
+        
+# NameService    
+
+Verweist und verwaltet auf alle Informationsservices
+
++RegisterInformationservices(Informationservice): Area , registriert den Informationsservice und gibt die Area die dieser verwalten soll zurück
++GetInformationservice(PositionOfV2 ): InformationService(Objekt mit url zur SOAP)
+
 # Prio 2 
         
 # WebServer       
-
 Alle V2 Cars posten an die
 visualisiert die Positionen der Autos auf einer Karte      
 
@@ -160,16 +169,3 @@ Der Tile Server kann unter der Adresse http://141.72.191.30/hot7{x}/{y}/{z}.png 
 Hinweise Umrechnung von longitude and latitude in die Werte x,y und z finden Sie auch hier : https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Lon..2Flat._to_tile_numbers_2
                         
                   
-# Prio 3
-
-                        
-# Name Service    
-
-1. Wieso Prio 3 ? -> Es wird davon ausgegangen, dass die Autos initial durch eine Factory erzeugt werden, die schon alle Kartenservices kennt.
-                     der Kartenservices wäre somit ein Upgrade.
-
-Benötigt um zwischen Position eines nachträglich gespawnetem Autos auf ein Informationsservice zu vernetzen ggf. Auch bei einem Ausfall eines Kartenservices.
-
-# Interface
-
-+GetInformationService(Posi)
