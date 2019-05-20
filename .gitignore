@@ -33,6 +33,8 @@ hs_err_pid*
 # Eclipse
 .settings/
 bin/
+.classpath
+.project
 
 # IntelliJ project files
 *.iml

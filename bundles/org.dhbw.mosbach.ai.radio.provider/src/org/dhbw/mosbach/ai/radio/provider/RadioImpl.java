@@ -1,13 +1,13 @@
 package org.dhbw.mosbach.ai.radio.provider;
 
-import java.util.Map;
-
 import org.dhbw.mosbach.ai.radio.api.IRadio;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+
+import java.util.Map;
 
 @Component(name = "radio", service = IRadio.class)
 public class RadioImpl implements IRadio {
@@ -28,5 +28,4 @@ public class RadioImpl implements IRadio {
         // specified port for other network participants to be able to find
         // the service
     }
-
 }
