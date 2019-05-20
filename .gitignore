@@ -31,15 +31,15 @@
 hs_err_pid*
 
 # Eclipse
-.classpath
-.project
 .settings/
+bin/
 
 # IntelliJ project files
 *.iml
 *.iws
 *.ipr
 .idea/
+out/
 
 # Mac OS X
 .DS_Store
