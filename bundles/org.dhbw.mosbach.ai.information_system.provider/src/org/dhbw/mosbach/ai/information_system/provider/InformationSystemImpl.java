@@ -1,17 +1,17 @@
 package org.dhbw.mosbach.ai.information_system.provider;
 
-import java.util.Map;
-
+import org.dhbw.mosbach.ai.base.Position;
 import org.dhbw.mosbach.ai.information_system.api.IInformationSystem;
 import org.dhbw.mosbach.ai.information_system.api.IPublishPosition;
-import org.dhbw.mosbach.ai.information_system.api.model.Position;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.ComponentContext;
 
-@Component(name = "information-system", service = {IInformationSystem.class, IPublishPosition.class})
+import java.util.Map;
+
+@Component(name = "information-system", service = { IInformationSystem.class, IPublishPosition.class })
 public class InformationSystemImpl implements IInformationSystem, IPublishPosition {
 
     @Activate
@@ -36,7 +36,7 @@ public class InformationSystemImpl implements IInformationSystem, IPublishPositi
 
     @Override
     public void overtakeInformationService(Position position00, Position position10, Position position01,
-            Position position11) {
+                                           Position position11) {
 
     }
 
@@ -44,9 +44,9 @@ public class InformationSystemImpl implements IInformationSystem, IPublishPositi
     public void receiveFinished(long v2Id) {
 
     }
-    
+
     @Override
     public void publish(Position position) {
-        
+
     }
 }

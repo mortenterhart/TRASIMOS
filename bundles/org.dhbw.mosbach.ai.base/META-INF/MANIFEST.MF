@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Base Modules
+Bundle-SymbolicName: org.dhbw.mosbach.ai.base
+Bundle-Version: 1.0.0
+Automatic-Module-Name: org.dhbw.mosbach.ai.base
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Export-Package: org.dhbw.mosbach.ai.base;version="1.0.0"
