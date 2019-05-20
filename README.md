@@ -171,4 +171,5 @@ Hinweise Umrechnung von longitude and latitude in die Werte x,y und z finden Sie
 Benötigt um zwischen Position eines nachträglich gespawnetem Autos auf ein Informationsservice zu vernetzen ggf. Auch bei einem Ausfall eines Kartenservices.
 
 # Interface
+
 +GetInformationService(Posi)
