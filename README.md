@@ -93,7 +93,7 @@ Der zu verwaltete Kartenbereich ca. 10km muss verteilt dargestellt werden, damit
 
 Die Karte in gleich große Stücke aufteilen (Schachbrett). Jedes Feld stellt einen Service dar. Jeder Service kennt alle 8 umliegenden Felder.
 
-Workflow:
+**Workflow**:
 
 1. Informationsservice besorgt sich vom Radio die url der SOAP vom Nameservice
 2. Informationsservice registriert sich beim Nameservice und bekommt von Nameservice Kartenstück zugewiesen. Zudem noch referenzen auf Umliegende Informationsservices.
