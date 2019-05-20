@@ -36,16 +36,16 @@ public class V2Impl implements IV2 {
         System.out.println("V2 shutting down ...");
     }
 
-    public Position getCurrentPosition() {
-        return currentPosition;
-    }
-
     public Position getDestination() {
         return destination;
     }
 
     public Position getOrigin() {
         return origin;
+    }
+
+    public Position getCurrentPosition() {
+        return currentPosition;
     }
 
     public int getId() {
@@ -62,10 +62,4 @@ public class V2Impl implements IV2 {
             }
         }
     }
-
-    @Override
-    public Position getCurrentPosition() {
-
-    }
-
 }
