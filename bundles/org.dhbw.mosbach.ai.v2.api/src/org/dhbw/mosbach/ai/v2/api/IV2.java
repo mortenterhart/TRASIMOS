@@ -1,6 +1,6 @@
 package org.dhbw.mosbach.ai.v2.api;
 
-import org.dhbw.mosbach.ai.v2.api.model.Position;
+import org.dhbw.mosbach.ai.base.Position;
 
 import java.util.Vector;
 

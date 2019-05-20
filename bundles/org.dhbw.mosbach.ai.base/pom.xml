@@ -45,8 +45,7 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            org.dhbw.mosbach.ai.information_system.api;version="1.0.0",
-                            org.dhbw.mosbach.ai.information_system.api.model;version="1.0.0"
+                            org.dhbw.mosbach.ai.base;version="1.0.0"
                         </Export-Package>
                         <!-- Enable processing of OSGi DS component and metatype annotations -->
                         <_dsannotaions>*</_dsannotaions>
