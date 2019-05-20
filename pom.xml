@@ -44,6 +44,9 @@
     </dependencies>
 
     <modules>
+        <!-- Base Module -->
+        <module>bundles/org.dhbw.mosbach.ai.base</module>
+
         <!-- Information System Modules -->
         <module>bundles/org.dhbw.mosbach.ai.information_system.api</module>
         <module>bundles/org.dhbw.mosbach.ai.information_system.provider</module>
@@ -51,6 +54,10 @@
         <!-- Name Server Modules -->
         <module>bundles/org.dhbw.mosbach.ai.name_server.api</module>
         <module>bundles/org.dhbw.mosbach.ai.name_server.provider</module>
+
+        <!-- Radio Modules -->
+        <module>bundles/org.dhbw.mosbach.ai.radio.api</module>
+        <module>bundles/org.dhbw.mosbach.ai.radio.provider</module>
 
         <!-- V2 Modules -->
         <module>bundles/org.dhbw.mosbach.ai.v2.api</module>
