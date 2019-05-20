@@ -4,5 +4,6 @@ import org.dhbw.mosbach.ai.base.Position;
 
 public interface INameServer {
 
-    public void getNameServer(Position position);
+	public String registerInfoServer(String url);
+    public String getInfoServer(Position position);
 }
