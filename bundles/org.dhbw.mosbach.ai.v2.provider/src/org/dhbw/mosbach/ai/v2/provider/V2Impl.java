@@ -1,8 +1,6 @@
 package org.dhbw.mosbach.ai.v2.provider;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 
 import org.dhbw.mosbach.ai.v2.api.IV2;
@@ -84,8 +82,7 @@ public class V2Impl implements IV2 {
                 while (currentPosition.getLongitude() != routePositions.get(nextRoutePositionIndex).getLongitude()) {
                     Thread.sleep(TIMEOUT);
                     publishPosition();
-                    retrieveNeighbours();
-                    coinFlipBraking();
+                    diceBraking();
                     drive(
                             currentPosition.getLatitude(), currentPosition.getLongitude(),
                             currentPosition.getLatitude(), routePositions.get(nextRoutePositionIndex).getLongitude()
@@ -94,8 +91,7 @@ public class V2Impl implements IV2 {
                 while (currentPosition.getLatitude() != routePositions.get(nextRoutePositionIndex).getLatitude()) {
                     Thread.sleep(TIMEOUT);
                     publishPosition();
-                    retrieveNeighbours();
-                    coinFlipBraking();
+                    diceBraking();
                     drive(
                             currentPosition.getLatitude(), currentPosition.getLongitude(),
                             routePositions.get(nextRoutePositionIndex).getLatitude(), currentPosition.getLongitude()
@@ -112,12 +108,19 @@ public class V2Impl implements IV2 {
 
     }
 
-    public void retrieveNeighbours() {
-
+    public List<Position> retrieveNeighbours() {
+        return new ArrayList<>();
     }
 
-    public void coinFlipBraking() {
-
+    public void diceBraking() {
+        if (!retrieveNeighbours().isEmpty()) {
+            Random r = new Random();
+            try {
+                Thread.sleep(r.nextInt(101) * 1000);
+            } catch (InterruptedException exc) {
+                exc.printStackTrace();
+            }
+        }
     }
 
     // happens in one second
