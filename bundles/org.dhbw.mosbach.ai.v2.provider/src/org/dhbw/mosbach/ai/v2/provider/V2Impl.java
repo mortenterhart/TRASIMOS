@@ -9,8 +9,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-
-import javax.swing.text.Position;
+import org.dhbw.mosbach.ai.v2.api.model.Position;
 
 @Component(name = "v2", service = IV2.class)
 public class V2Impl implements IV2 {
@@ -20,10 +19,12 @@ public class V2Impl implements IV2 {
     private Position currentPosition;
     private Vector<Long> direction;
     private double velocity;
+    private List<Position> routePositions;
 
     public V2Impl(double originLongitude, double originLatitude, double destinationLongitude, double destinationLatitude) {
         origin = new Position(originLongitude, originLatitude);
         destination = new Position(destinationLongitude, destinationLatitude);
+        currentPosition = origin;
     }
 
     @Activate
