@@ -11,5 +11,5 @@ Import-Package: org.dhbw.mosbach.ai.base;version="1.0.0",
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.osgi;bundle-version="3.13.300",
  org.eclipse.osgi.services;bundle-version="3.8.0"
-Service-Component: OSGI-INF/name-server.xml
 Export-Package: org.dhbw.mosbach.ai.name_server.provider
+Service-Component: OSGI-INF/name-server.xml
