@@ -73,6 +73,7 @@
 
         <!-- V2 Modules -->
         <module>bundles/org.dhbw.mosbach.ai.v2.api</module>
+        <module>bundles/org.dhbw.mosbach.ai.v2.factory</module>
         <module>bundles/org.dhbw.mosbach.ai.v2.provider</module>
 
         <!-- Webserver Modules -->

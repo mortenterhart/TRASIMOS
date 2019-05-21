@@ -12,7 +12,17 @@ import java.util.Map;
 import java.util.Vector;
 
 @Component(name = "v2", service = IV2.class)
-public class V2Impl implements IV2 {
+public class V2Impl implements IV2, Runnable {
+    
+    private final int id;
+    
+    public V2Impl() {
+       this.id = 0;
+    }
+    
+    public V2Impl(int id) {
+        this.id = id;
+    }
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
@@ -27,5 +37,18 @@ public class V2Impl implements IV2 {
     @Override
     public void getPosition(Position position, Vector<Long> direction, double speed) {
 
+    }
+    
+    @Override
+    public void run() {
+        while (true) {
+            System.out.println("V2 driving: " + id);
+            
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException exc) {
+                exc.printStackTrace();
+            }
+        }
     }
 }
