@@ -131,10 +131,10 @@ public class InformationSystemImpl implements IInformationSystem, IPublishPositi
 
     private boolean isVehicleNearBoundary(Position position, double speed) {
         double stoppingDistance = calcStoppingDistance(speed);
-        return position.getLatitude() > (areaBoundaries.getBottomLeft().getLongitude() + stoppingDistance) &&
-                position.getLatitude() < (areaBoundaries.getBottomRight().getLongitude() - stoppingDistance) &&
-                position.getLatitude() < (areaBoundaries.getTopLeft().getLatitude() - stoppingDistance) &&
-                position.getLatitude() > (areaBoundaries.getBottomLeft().getLatitude() + stoppingDistance);
+        return position.getLongitude() <= (areaBoundaries.getTopLeft().getLongitude() + stoppingDistance) ||
+                position.getLongitude() >= (areaBoundaries.getTopRight().getLongitude() - stoppingDistance) ||
+                position.getLatitude() >= (areaBoundaries.getTopLeft().getLatitude() - stoppingDistance) ||
+                position.getLatitude() <= (areaBoundaries.getBottomLeft().getLatitude() + stoppingDistance);
     }
 
     private double calcStoppingDistance(double speed) {
