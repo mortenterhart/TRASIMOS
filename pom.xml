@@ -28,12 +28,24 @@
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.service.component.annotations</artifactId>
             <version>1.3.0</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.eclipse.osgi/org.eclipse.osgi -->
+        <dependency>
+            <groupId>org.eclipse.osgi</groupId>
+            <artifactId>org.eclipse.osgi</artifactId>
+            <version>3.7.1</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.osgi</groupId>
             <artifactId>org.eclipse.osgi.services</artifactId>
             <version>3.2.100.v20100503</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.annotation</artifactId>
+            <version>7.0.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -44,6 +56,9 @@
     </dependencies>
 
     <modules>
+        <!-- Base Module -->
+        <module>bundles/org.dhbw.mosbach.ai.base</module>
+
         <!-- Information System Modules -->
         <module>bundles/org.dhbw.mosbach.ai.information_system.api</module>
         <module>bundles/org.dhbw.mosbach.ai.information_system.provider</module>
@@ -51,6 +66,10 @@
         <!-- Name Server Modules -->
         <module>bundles/org.dhbw.mosbach.ai.name_server.api</module>
         <module>bundles/org.dhbw.mosbach.ai.name_server.provider</module>
+
+        <!-- Radio Modules -->
+        <module>bundles/org.dhbw.mosbach.ai.radio.api</module>
+        <module>bundles/org.dhbw.mosbach.ai.radio.provider</module>
 
         <!-- V2 Modules -->
         <module>bundles/org.dhbw.mosbach.ai.v2.api</module>

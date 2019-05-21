@@ -1,14 +1,14 @@
 package org.dhbw.mosbach.ai.webserver.provider;
 
-import java.util.Map;
-
+import org.dhbw.mosbach.ai.base.Position;
 import org.dhbw.mosbach.ai.webserver.api.IWebserver;
-import org.dhbw.mosbach.ai.webserver.api.model.Position;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+
+import java.util.Map;
 
 @Component(name = "webserver", service = IWebserver.class)
 public class WebserverImpl implements IWebserver {

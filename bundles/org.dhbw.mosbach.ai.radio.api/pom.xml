@@ -12,11 +12,11 @@
     </parent>
 
     <groupId>org.dhbw.mosbach.ai</groupId>
-    <artifactId>name-server-api</artifactId>
+    <artifactId>radio-api</artifactId>
     <version>1.0.0</version>
     <packaging>bundle</packaging>
 
-    <name>name-server-api</name>
+    <name>radio-api</name>
     <url>http://www.mosbach.dhbw.de/angewandte-informatik.html</url>
 
     <properties>
@@ -24,12 +24,7 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.dhbw.mosbach.ai</groupId>
-            <artifactId>base-modules</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
+
     </dependencies>
 
     <build>

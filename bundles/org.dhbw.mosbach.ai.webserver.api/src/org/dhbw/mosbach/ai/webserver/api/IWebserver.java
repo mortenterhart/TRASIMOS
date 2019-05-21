@@ -1,6 +1,6 @@
 package org.dhbw.mosbach.ai.webserver.api;
 
-import org.dhbw.mosbach.ai.webserver.api.model.Position;
+import org.dhbw.mosbach.ai.base.Position;
 
 public interface IWebserver {
 
