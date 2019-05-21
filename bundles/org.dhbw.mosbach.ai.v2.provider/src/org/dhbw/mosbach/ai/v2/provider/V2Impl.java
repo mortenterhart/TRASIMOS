@@ -4,12 +4,13 @@ import java.util.Map;
 import java.util.Vector;
 
 
+import org.dhbw.mosbach.ai.v2.api.IV2;
+import org.dhbw.mosbach.ai.base.Position;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import org.dhbw.mosbach.ai.v2.api.model.Position;
 
 @Component(name = "v2", service = IV2.class)
 public class V2Impl implements IV2 {
@@ -30,6 +31,7 @@ public class V2Impl implements IV2 {
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
         System.out.println("V2 booting ...");
+        // RadioClient -> NameServer -> InformationServer
     }
 
     @Deactivate
@@ -52,15 +54,39 @@ public class V2Impl implements IV2 {
     public int getId() {
         return id;
     }
+
+    /*  1) Position publishen
+        2) Neighbours anfragen
+        3) Collision Detection: Geschwindigkeit anpassen
+        4) Drive
+    * */
     public void run() {
-        boolean isDriving = true;
-        while (isDriving) {
+        while (currentPosition != destination) {
             try {
                 Thread.sleep(TIMEOUT);
-                System.out.println("Driving");
+                publishPosition();
+                retrieveNeighbours();
+                coinFlipBraking();
+                drive();
             } catch (InterruptedException exc) {
                 exc.printStackTrace();
             }
         }
+    }
+
+    public void publishPosition() {
+
+    }
+
+    public void retrieveNeighbours() {
+
+    }
+
+    public void coinFlipBraking() {
+
+    }
+
+    public void drive() {
+        System.out.println("Driving");
     }
 }
