@@ -1,86 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<modelVersion>4.0.0</modelVersion>
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.dhbw.mosbach.ai</groupId>
-		<artifactId>trasimos</artifactId>
-		<version>1.0.0</version>
-		<relativePath>../..</relativePath>
-	</parent>
+    <parent>
+        <groupId>org.dhbw.mosbach.ai</groupId>
+        <artifactId>trasimos</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../..</relativePath>
+    </parent>
 
-	<groupId>org.dhbw.mosbach.ai</groupId>
-	<artifactId>v2-factory</artifactId>
-	<version>1.0.0</version>
-	<packaging>bundle</packaging>
+    <groupId>org.dhbw.mosbach.ai</groupId>
+    <artifactId>v2-factory</artifactId>
+    <version>1.0.0</version>
+    <packaging>bundle</packaging>
 
-	<name>v2-factory</name>
-	<url>http://www.mosbach.dhbw.de/angewandte-informatik.html</url>
+    <name>v2-factory</name>
+    <url>http://www.mosbach.dhbw.de/angewandte-informatik.html</url>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.dhbw.mosbach.ai</groupId>
-			<artifactId>v2-provider</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.cxf/cxf -->
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf</artifactId>
-			<version>3.1.3</version>
-			<type>pom</type>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-databinding-jaxb</artifactId>
-			<version>2.2.5</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-frontend-simple</artifactId>
-			<version>3.2.7</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.main.extras</groupId>
-			<artifactId>glassfish-embedded-all</artifactId>
-			<version>4.1.2</version>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.dhbw.mosbach.ai</groupId>
+            <artifactId>v2-provider</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.cxf/cxf -->
 
-	<build>
-		<finalName>${project.artifactId}</finalName>
-		<sourceDirectory>src</sourceDirectory>
+        <!-- WEBSERVICE-->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>rt</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/javax.xml.ws/jaxws-api -->
+        <dependency>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>rt</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-jaxb</artifactId>
+            <version>2.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-jaxb</artifactId>
+            <version>2.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-simple</artifactId>
+            <version>3.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.2</version>
+        </dependency>
+    </dependencies>
 
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<version>4.2.0</version>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<!-- Enable processing of OSGi DS component and metatype annotations -->
-						<_dsannotaions>*</_dsannotaions>
-						<_metatypeannotations>*</_metatypeannotations>
-					</instructions>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <sourceDirectory>src</sourceDirectory>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>4.2.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <!-- Enable processing of OSGi DS component and metatype annotations -->
+                        <_dsannotaions>*</_dsannotaions>
+                        <_metatypeannotations>*</_metatypeannotations>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -8,8 +8,8 @@ public class V2FactoryClient {
 
     public static void main(String[] args) throws Exception {
         URL wsdlUrl = new URL("http://localhost:25001/v2factory/createV2Cars?wsdl");
-        QName qname = new QName("http://v2.factory", "v2.factory");
-        Service factory = Service.create(qname);
+        QName qname = new QName("http://factory.v2.ai.mosbach.dhbw.org/", "FactoryServiceService");
+        Service factory = Service.create(wsdlUrl, qname);
         IV2Factory factoryService = factory.getPort(IV2Factory.class);
         factoryService.createV2Cars(500);
     }

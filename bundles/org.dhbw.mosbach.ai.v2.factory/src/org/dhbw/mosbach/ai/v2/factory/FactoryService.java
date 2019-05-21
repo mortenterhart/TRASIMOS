@@ -5,7 +5,7 @@ import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.v2.factory.FactoryService")
-public class FactoryService {
+public class FactoryService implements IV2Factory {
 
     @WebMethod
     public void createV2Cars(int count) {
@@ -14,7 +14,7 @@ public class FactoryService {
     }
 
     public static void startService() {
-        FactoryService service = new FactoryService();
+        Object service = new FactoryService();
         String factoryAddress = "http://localhost:25001/v2factory/createV2Cars";
         Endpoint.publish(factoryAddress, service);
     }
