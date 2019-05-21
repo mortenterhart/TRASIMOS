@@ -4,7 +4,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
-@WebService(endpointInterface = "org.dhbw.mosbach.ai.v2.factory.FactoryService")
+@WebService(endpointInterface = "org.dhbw.mosbach.ai.v2.factory.IV2Factory")
 public class FactoryService implements IV2Factory {
 
     @WebMethod
