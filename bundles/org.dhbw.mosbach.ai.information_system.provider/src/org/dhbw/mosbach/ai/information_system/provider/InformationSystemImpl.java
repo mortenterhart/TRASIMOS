@@ -3,6 +3,7 @@ package org.dhbw.mosbach.ai.information_system.provider;
 import org.dhbw.mosbach.ai.base.Position;
 import org.dhbw.mosbach.ai.information_system.api.IInformationSystem;
 import org.dhbw.mosbach.ai.information_system.api.IPublishPosition;
+import org.osgi.annotation.versioning.Version;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
