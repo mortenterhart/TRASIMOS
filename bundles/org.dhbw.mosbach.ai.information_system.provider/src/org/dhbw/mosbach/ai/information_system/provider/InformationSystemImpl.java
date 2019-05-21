@@ -1,5 +1,6 @@
 package org.dhbw.mosbach.ai.information_system.provider;
 
+import org.dhbw.mosbach.ai.base.MapChunk;
 import org.dhbw.mosbach.ai.base.Position;
 import org.dhbw.mosbach.ai.information_system.api.IInformationSystem;
 import org.dhbw.mosbach.ai.information_system.api.IPublishPosition;
@@ -10,14 +11,21 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-@Component(name = "information-system", service = { IInformationSystem.class, IPublishPosition.class })
+@Component(name = "information-system", service = {IInformationSystem.class, IPublishPosition.class})
 public class InformationSystemImpl implements IInformationSystem, IPublishPosition {
+    private HashMap<Long, Position> vehiclesToObserve;
+    private MapChunk areaBoundaries;
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
         System.out.println("Information system booting ...");
+        System.out.println("Try to register at name server ...");
+        vehiclesToObserve = new HashMap<>();
     }
 
     @Deactivate
@@ -29,7 +37,7 @@ public class InformationSystemImpl implements IInformationSystem, IPublishPositi
     public boolean receivePosition(long v2Id, Position position) {
         // Add/Update vehicle in Map
         // if vehicle id already exists the position of vehicle will be overridden
-        if(isVehicleInBoundary(position)){
+        if (isVehicleInBoundary(position)) {
             vehiclesToObserve.put(v2Id, position);
             return true;
         }
@@ -39,7 +47,8 @@ public class InformationSystemImpl implements IInformationSystem, IPublishPositi
     /**
      * get neighbours of vehicle by its id and speed.
      * requres that vehicle is observed by this information system
-     * @param v2Id id of v2 vehicle
+     *
+     * @param v2Id  id of v2 vehicle
      * @param speed speed of v2 vehicle
      * @return list of positions of neighbours
      */
@@ -49,9 +58,15 @@ public class InformationSystemImpl implements IInformationSystem, IPublishPositi
         // Vehicle needs to publish its position first
         if (isVehicleKnown(v2Id)) {
             List<Position> positionOfNeighbours = new ArrayList<>();
-            // stopping distance = reaction time distance + actual stopping distance
+            // Check if vehicle is too close at boundary. If confirmed getNeighbours from other information systems
+
             Position positionOfVehicle = vehiclesToObserve.get(v2Id);
 
+            if (isVehicleNearBoundary(positionOfVehicle, speed)) {
+                // Vehicle to close at boundary
+                // TODO: Ask other servers
+            }
+            // Add neighbours in boundary
             for (Position pos : vehiclesToObserve.values()) {
                 if (distanceBetweenPositions(positionOfVehicle, pos) <= calcStoppingDistance(speed)) {
                     positionOfNeighbours.add(pos);
@@ -64,12 +79,13 @@ public class InformationSystemImpl implements IInformationSystem, IPublishPositi
 
     /**
      * get neighbours of position in a specific radius
+     *
      * @param position centre position
-     * @param radius radius around position
+     * @param radius   radius around position
      * @return list of positions of neighbours
      */
     @Override
-    public List<Position> getNeighbours(Position position, double radius){
+    public List<Position> getNeighbours(Position position, double radius) {
         List<Position> positionOfNeighbours = new ArrayList<>();
 
         for (Position pos : vehiclesToObserve.values()) {
@@ -83,6 +99,7 @@ public class InformationSystemImpl implements IInformationSystem, IPublishPositi
 
     /**
      * remove vehicle from observing
+     *
      * @param v2Id id of v2 vehicle
      */
     @Override
@@ -106,22 +123,29 @@ public class InformationSystemImpl implements IInformationSystem, IPublishPositi
     }
 
     private boolean isVehicleInBoundary(Position position) {
-        if (position.getLongitude() > westBound && position.getLongitude() < eastBound && position.getLatitude() < northBound && position.getLatitude() > southBound){
-            return true;
-        }
-        return false;
+        return position.getLongitude() > areaBoundaries.getBottomLeft().getLongitude() &&
+                position.getLongitude() < areaBoundaries.getBottomRight().getLongitude() &&
+                position.getLatitude() < areaBoundaries.getTopLeft().getLatitude() &&
+                position.getLatitude() > areaBoundaries.getBottomLeft().getLatitude();
     }
 
-    private boolean isVehicleNearBoundary(Position position, double speed){
+    private boolean isVehicleNearBoundary(Position position, double speed) {
         double stoppingDistance = calcStoppingDistance(speed);
-        if(position.getLatitude() > (westBound + stoppingDistance) && position.getLatitude() < (eastBound - stoppingDistance) &&
-                position.getLatitude() < (northbound - stoppingDistance) && position.getLatitude() > (southbound + stoppingDistance)){
-            return true;
-        }
-        return false;
+        return position.getLatitude() > (areaBoundaries.getBottomLeft().getLongitude() + stoppingDistance) &&
+                position.getLatitude() < (areaBoundaries.getBottomRight().getLongitude() - stoppingDistance) &&
+                position.getLatitude() < (areaBoundaries.getTopLeft().getLatitude() - stoppingDistance) &&
+                position.getLatitude() > (areaBoundaries.getBottomLeft().getLatitude() + stoppingDistance);
     }
 
-    private double calcStoppingDistance(double speed){
+    private double calcStoppingDistance(double speed) {
         return (speed / 10 * 3) + (speed / 10 * speed / 10);
+    }
+
+    public MapChunk getAreaBoundaries() {
+        return areaBoundaries;
+    }
+
+    public void setAreaBoundaries(MapChunk areaBoundaries) {
+        this.areaBoundaries = areaBoundaries;
     }
 }
