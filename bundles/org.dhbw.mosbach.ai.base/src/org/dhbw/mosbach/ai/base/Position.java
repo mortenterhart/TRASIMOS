@@ -1,28 +1,23 @@
 package org.dhbw.mosbach.ai.base;
 
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class Position {
 
-    private double longitude;
-    private double latitude;
+    @XmlAttribute(required = true)
+    public double longitude=0;
+    @XmlAttribute(required = true)
+    public double latitude=0;
+
+    public Position(){
+
+    }
 
     public Position(double longitude, double latitude) {
         this.longitude = longitude;
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
@@ -31,8 +26,8 @@ public class Position {
     }
 
     public Position midPoint(Position pos) {
-        double mLat = (pos.getLatitude() + this.getLatitude()) / 2;
-        double mLong = (pos.getLongitude() + this.getLongitude()) / 2;
+        double mLat = (pos.latitude + this.latitude) / 2;
+        double mLong = (pos.longitude + this.longitude) / 2;
         return new Position(mLong, mLat);
     }
 }
