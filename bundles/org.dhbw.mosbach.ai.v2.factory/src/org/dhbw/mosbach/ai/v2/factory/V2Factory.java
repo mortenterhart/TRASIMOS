@@ -15,6 +15,7 @@ import org.osgi.service.component.annotations.Deactivate;
 public class V2Factory implements IV2Factory {
 
     private List<Thread> cars = new ArrayList<>();
+    private int id = 0;
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
@@ -41,12 +42,14 @@ public class V2Factory implements IV2Factory {
             throw new IllegalArgumentException("Number of V2s to create has to be positive: " + count);
         }
         
-        for (int i = 0; i < count; i++) {
+        for (int i = id; i < count + id; i++) {
             V2Impl v2 = new V2Impl(i);
+            System.out.println("Thread with id " + i);
 
             Thread thread = new Thread(v2);
             cars.add(thread);
             thread.start();
         }
+        id += count;
     }
 }

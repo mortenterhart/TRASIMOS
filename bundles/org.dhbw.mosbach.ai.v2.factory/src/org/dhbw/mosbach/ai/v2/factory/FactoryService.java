@@ -7,9 +7,11 @@ import javax.xml.ws.Endpoint;
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.v2.factory.IV2Factory")
 public class FactoryService implements IV2Factory {
 
+    private V2Factory factory = new V2Factory();
+
     @WebMethod
     public void createV2Cars(int count) {
-        V2Factory factory = new V2Factory();
+        System.out.println("V2Factory: Creating " + count + " cars");
         factory.createV2Cars(count);
     }
 
