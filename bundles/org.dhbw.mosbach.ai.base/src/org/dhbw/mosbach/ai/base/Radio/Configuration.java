@@ -12,7 +12,7 @@ public class Configuration {
     public static final int Radio_Delay_Broadcast= 1000;
 
     public static String Radio_Registration_url = ":20000/Registration";
-    public static final String Radio_Registration_IMPL_NameSpace = "http://SOAPRegisterService.BroadcastRadio.AdditionService.example/";
+    public static final String Radio_Registration_IMPL_NameSpace = "http://provider.radio.ai.mosbach.dhbw.org/";
     public static final String Radio_Registration_Local_Part = "RegisterServiceService";
 
 

@@ -50,8 +50,6 @@ public class ServiceConverter {
             String json = g.toJson(serviceInformation);
             int hash = calclulateHash(json);
 
-            System.out.println("____SENDHASH HASH"+hash);
-
             byte[] jsonBytes = json.getBytes();
             byte[] hashBytes = ByteBuffer.allocate(4).putInt(hash).array();
 
@@ -99,7 +97,6 @@ public class ServiceConverter {
                 String json = new String(jsonBytes);
                 System.out.println(json);
                 int recHash = calclulateHash(json);
-                System.out.println("__RECEIVED HASH"+recHash);
                 if (hash == recHash) {
                     Gson g = new Gson();
                     return g.fromJson(json,ServiceInformation.class);

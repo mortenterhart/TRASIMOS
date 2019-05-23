@@ -9,6 +9,7 @@ public class BroadcastConsumer implements Runnable, IBroadcastConsumer{
     String multiCastAddress;
     int multiCastPort;
     private volatile boolean stop=false;
+    private volatile boolean foundService = false;
 
     volatile String serviceTyp="";
     volatile ArrayList<String> serviceURLS = new ArrayList<>();
@@ -60,9 +61,10 @@ public class BroadcastConsumer implements Runnable, IBroadcastConsumer{
 
 
                     ServiceInformation serviceInformation = ServiceConverter.getServiceInformation(buffer);
-                    if (serviceInformation!=null && serviceInformation.serviceTyp != null && serviceInformation.urls !=null){
+                    if (serviceInformation!=null && serviceInformation.serviceTyp != null && serviceInformation.urls !=null && serviceInformation.urls.size()>0){
                         this.serviceTyp = serviceInformation.serviceTyp;
                         this.serviceURLS = serviceInformation.urls;
+                        foundService = true;
                     }
                 } catch (Exception e) {
                     System.out.println("No object could be read from the received UDP datagram."+e);
@@ -76,6 +78,10 @@ public class BroadcastConsumer implements Runnable, IBroadcastConsumer{
         }catch (Exception e){
             System.out.println(e);
         }
+    }
+
+    public boolean isServiceFound(){
+        return foundService;
     }
 
 }

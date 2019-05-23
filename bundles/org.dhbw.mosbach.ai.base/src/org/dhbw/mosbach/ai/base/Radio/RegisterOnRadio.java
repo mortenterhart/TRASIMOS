@@ -13,7 +13,7 @@ public class RegisterOnRadio {
     String url;
 
 
-    public RegisterOnRadio(String RadioUrl) throws MalformedURLException {
+    public RegisterOnRadio(String RadioUrl) {
         this.url=RadioUrl;
     }
 

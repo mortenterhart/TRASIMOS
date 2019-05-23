@@ -61,7 +61,6 @@ public class BroadcastPublisher implements Runnable{
         //Prepare Data
         byte[] data = ServiceConverter.convertServiceInformationToByte(serviceInformation);
 
-        System.out.println("Send bytes: "+data.length);
         //Send data
         s.send(new DatagramPacket(data, data.length, group, multiCastPort));
     }

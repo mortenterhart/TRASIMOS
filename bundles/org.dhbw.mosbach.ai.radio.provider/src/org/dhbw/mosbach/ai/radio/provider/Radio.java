@@ -133,7 +133,7 @@ public class Radio implements Runnable, IRegisterListener {
 
     //GetTCP Messages via Oberserver Pattern
     @Override
-    public void getNotified(String serviceTyp,String url){
+    public void getNotified(String url,String serviceTyp){
         switch (serviceTyp){
             //Adds and sets new url to publisher as Message for UDP Port
             case Configuration.NameService_ContentType :
@@ -156,7 +156,6 @@ public class Radio implements Runnable, IRegisterListener {
     }
 
     public void setNameServiceMessage(){
-
         ServiceInformation serviceInformation = new ServiceInformation();
         serviceInformation.serviceTyp = Configuration.NameService_ContentType;
         serviceInformation.urls.addAll(nameServices);
