@@ -2,6 +2,7 @@ package org.dhbw.mosbach.ai.information_system.provider;
 
 import org.dhbw.mosbach.ai.base.MapChunk;
 import org.dhbw.mosbach.ai.base.Position;
+import org.dhbw.mosbach.ai.base.V2Info;
 import org.dhbw.mosbach.ai.information_system.api.IInformationSystem;
 import org.dhbw.mosbach.ai.information_system.api.IPublishPosition;
 import org.osgi.framework.BundleContext;
@@ -24,7 +25,7 @@ import java.util.Map;
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.information_system.api.IInformationSystem")
 @Component(name = "information-system", service = {IInformationSystem.class, IPublishPosition.class})
 public class InformationSystemImpl implements IPublishPosition, IInformationSystem {
-    private HashMap<Long, Position> vehiclesToObserve;
+    private HashMap<Long, V2Info> vehiclesToObserve;
     private MapChunk areaBoundaries;
 
     @Activate
@@ -42,15 +43,15 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
     @Override
     @WebMethod
-    public boolean receivePosition(long v2Id, Position position) {
+    public boolean receivePosition(V2Info v2Info) {
 
         System.out.println("SERVER: I RECEIVED A RECEIVE POSITION REQUEST");
-        System.out.println("SERVER: CAR ID "+v2Id);
-        System.out.println("SERVER: Position "+position.latitude+"|"+position.longitude);
+        System.out.println("SERVER: CAR ID " + v2Info.V2id);
+        System.out.println("SERVER: Position " + v2Info.position.latitude + "|" + v2Info.position.longitude);
         // Add/Update vehicle in Map
         // if vehicle id already exists the position of vehicle will be overridden
-        if (isVehicleInBoundary(position)) {
-            vehiclesToObserve.put(v2Id, position);
+        if (isVehicleInBoundary(v2Info.position)) {
+            vehiclesToObserve.put(v2Info.V2id, v2Info);
             return true;
         }
         return false;
@@ -66,23 +67,21 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
      */
     @Override
     @WebMethod
-    public ArrayList<Position> getNeighbours(long v2Id, double speed) {
+    public ArrayList<V2Info> getNeighbours(V2Info v2Info) {
         // If vehicle is new, neighbours can not be resolved
         // Vehicle needs to publish its position first
-        if (isVehicleKnown(v2Id)) {
-            ArrayList<Position> positionOfNeighbours = new ArrayList<>();
+        if (isVehicleKnown(v2Info.V2id)) {
+            ArrayList<V2Info> positionOfNeighbours = new ArrayList<>();
             // Check if vehicle is too close at boundary. If confirmed getNeighbours from other information systems
 
-            Position positionOfVehicle = vehiclesToObserve.get(v2Id);
-
-            if (isVehicleNearBoundary(positionOfVehicle, speed)) {
+            if (isVehicleNearBoundary(v2Info.position, v2Info.speed)) {
                 // Vehicle to close at boundary
                 // TODO: Ask other servers
             }
             // Add neighbours in boundary
-            for (Position pos : vehiclesToObserve.values()) {
-                if (distanceBetweenPositions(positionOfVehicle, pos) <= calcStoppingDistance(speed)) {
-                    positionOfNeighbours.add(pos);
+            for (V2Info info : vehiclesToObserve.values()) {
+                if (distanceBetweenPositions(v2Info.position, info.position) <= calcStoppingDistance(v2Info.speed)) {
+                    positionOfNeighbours.add(info);
                 }
             }
             return positionOfNeighbours;
@@ -99,12 +98,12 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
      */
     @Override
     @WebMethod
-    public ArrayList<Position> getNeighbours(Position position, double radius) {
-        ArrayList<Position> positionOfNeighbours = new ArrayList<>();
+    public ArrayList<V2Info> getNeighbours(Position position, double radius) {
+        ArrayList<V2Info> positionOfNeighbours = new ArrayList<>();
 
-        for (Position pos : vehiclesToObserve.values()) {
-            if (distanceBetweenPositions(position, pos) <= radius) {
-                positionOfNeighbours.add(pos);
+        for (V2Info info : vehiclesToObserve.values()) {
+            if (distanceBetweenPositions(position, info.position) <= radius) {
+                positionOfNeighbours.add(info.position);
             }
         }
 
@@ -118,8 +117,8 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
      */
     @Override
     @WebMethod
-    public void receiveFinished(long v2Id) {
-        vehiclesToObserve.remove(v2Id);
+    public void receiveFinished(V2Info v2Info) {
+        vehiclesToObserve.remove(v2Info.V2id);
     }
 
 
@@ -172,13 +171,13 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         Fabi test zum starten von Zervice
     */
 
-    public static void main(String args[]){
+    public static void main(String args[]) {
 
         //START SERVICES
         IInformationSystem impl = new InformationSystemImpl();
         Object implementor = impl;
         String address = "http://localhost:9001/extremeCoolSoapApi";
-        Endpoint.publish(address,implementor);
+        Endpoint.publish(address, implementor);
 
         //WAIT FOR BETTER WETTER
         try {
@@ -201,14 +200,14 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
 
         //Make some cool Queries
-        while (true){
+        while (true) {
 
-            System.out.println("CLIENT: TRYING TO PUBLISH MY POSITION ID= "+392193129);
+            System.out.println("CLIENT: TRYING TO PUBLISH MY POSITION ID= " + 392193129);
             Position position = new Position();
             position.longitude = 2313;
             position.latitude = 2323;
-            boolean succes= iInformationSystem.receivePosition(392193129,position);
-            System.out.println("CLIENT: Publish Position worked out: "+succes);
+            boolean succes = iInformationSystem.receivePosition(392193129, position);
+            System.out.println("CLIENT: Publish Position worked out: " + succes);
         }
     }
 
