@@ -30,4 +30,12 @@ public class Position {
         double mLong = (pos.longitude + this.longitude) / 2;
         return new Position(mLong, mLat);
     }
+
+    public double getLongitude(){
+        return longitude;
+    }
+
+    public double getLatitude(){
+        return latitude;
+    }
 }
