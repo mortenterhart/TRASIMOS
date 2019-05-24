@@ -9,12 +9,14 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 
+import javax.xml.ws.Endpoint;
 import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.Map;
 
+
 @Component(name = "radio",service = IRadio.class)
-public class Radio implements Runnable, IRegisterListener  {
+public class Radio implements Runnable, IRegisterListener,IRadio  {
 
 
     @Activate
@@ -35,12 +37,19 @@ public class Radio implements Runnable, IRegisterListener  {
     BroadcastPublisher webserverPublish;
     Thread webserverThread;
 
+    Thread threadRadio;
+
+    RegisterService registerService;
+
+
     public static volatile ArrayList<String> nameServices = new ArrayList<>();
     public static volatile ArrayList<String> webServer = new ArrayList<>();
 
     public Radio(){
-
+            threadRadio = new Thread(this);
+            threadRadio.start();
     }
+
 
     @Override
     public void run() {
@@ -56,8 +65,15 @@ public class Radio implements Runnable, IRegisterListener  {
 
             try {
 
+
+                String url = Configuration.general_https+"0.0.0.0"+Configuration.Radio_Registration_url;
+                registerService = new RegisterService();
+                registerService.addIRegisterListener(this);
+                Object implementor = registerService;
+                String address = url;
+                Endpoint.publish(address, implementor);
                 //Create SOAP Webservice for Registration of Service
-                RegisterService.startService(this,Configuration.general_https+"0.0.0.0"+Configuration.Radio_Registration_url);
+                //RegisterService.startService(this,Configuration.general_https+"0.0.0.0"+Configuration.Radio_Registration_url);
 
                 initalized=true;
 
@@ -180,5 +196,10 @@ public class Radio implements Runnable, IRegisterListener  {
         serviceInformation.serviceTyp = Configuration.NameService_ContentType;
         serviceInformation.urls.addAll(nameServices);
         this.namePublish.setMessage(serviceInformation);
+    }
+
+    @Override
+    public void registerServiceAccess(String url, String serviceTyp) {
+        registerService.registerServiceAccess(url,serviceTyp);
     }
 }
