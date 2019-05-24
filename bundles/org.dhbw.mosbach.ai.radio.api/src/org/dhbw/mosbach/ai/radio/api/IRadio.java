@@ -10,5 +10,5 @@ import javax.jws.soap.SOAPBinding;
 public interface IRadio {
 
     @WebMethod
-    public void registerServiceAccess(String url, String serviceTyp);
+    public void registerServiceAccess(String serviceTyp, String url);
 }

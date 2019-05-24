@@ -4,8 +4,8 @@ import org.dhbw.mosbach.ai.base.MapChunk;
 import org.dhbw.mosbach.ai.base.Position;
 import org.dhbw.mosbach.ai.base.Radio.BroadcastConsumer;
 import org.dhbw.mosbach.ai.base.Radio.Configuration;
-import org.dhbw.mosbach.ai.base.Radio.RegisterOnRadio;
 import org.dhbw.mosbach.ai.name_server.api.INameServer;
+import org.dhbw.mosbach.ai.radio.api.RadioSOAP;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -16,6 +16,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 import java.net.Inet4Address;
+import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,16 +51,21 @@ public class NameServerImpl implements INameServer {
 
         if (radioListener.getServiceURLs().size() > 0) {
         	String radioRegiURl = radioListener.getServiceURLs().get(0);
-        	RegisterOnRadio registerOnRadio = new RegisterOnRadio(radioRegiURl);
+			RadioSOAP radioSOAP = null;
+			try {
+				radioSOAP = new RadioSOAP(radioRegiURl);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
 
 
-        	try {
+			try {
 
                 String localIp = Inet4Address.getLocalHost().getHostAddress();
                 //Register nameService
                 String nameserviceURL = "http://"+localIp+":9001/NameServer";
 
-                registerOnRadio.registrateURLOnRadio(Configuration.NameService_ContentType, nameserviceURL);
+                radioSOAP.registerServiceAccess(Configuration.NameService_ContentType, nameserviceURL);
         	} catch (Exception e) {
         		e.printStackTrace();
         	}
