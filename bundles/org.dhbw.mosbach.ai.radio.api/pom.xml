@@ -87,6 +87,9 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Export-Package>
+                            org.dhbw.mosbach.ai.radio.api;version="1.0.0"
+                        </Export-Package>
                         <!-- Enable processing of OSGi DS component and metatype annotations -->
                         <_dsannotaions>*</_dsannotaions>
                         <_metatypeannotations>*</_metatypeannotations>

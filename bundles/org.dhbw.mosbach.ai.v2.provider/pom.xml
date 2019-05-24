@@ -40,6 +40,56 @@
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
+
+
+
+        <!-- WEBSERVICE-->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>rt</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/javax.xml.ws/jaxws-api -->
+        <dependency>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>rt</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-jaxb</artifactId>
+            <version>2.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-jaxb</artifactId>
+            <version>2.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-simple</artifactId>
+            <version>3.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.2</version>
+        </dependency>
     </dependencies>
 
     <parent>
@@ -49,7 +99,6 @@
         <relativePath>../..</relativePath>
     </parent>
 
-    <groupId>org.dhbw.mosbach.ai</groupId>
     <artifactId>v2-provider</artifactId>
     <version>1.0.0</version>
     <packaging>bundle</packaging>
@@ -83,6 +132,9 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Export-Package>
+                            org.dhbw.mosbach.ai.v2.provider;version="1.0.0"
+                        </Export-Package>
                         <!-- Enable processing of OSGi DS component and metatype annotations -->
                         <_dsannotaions>*</_dsannotaions>
                         <_metatypeannotations>*</_metatypeannotations>

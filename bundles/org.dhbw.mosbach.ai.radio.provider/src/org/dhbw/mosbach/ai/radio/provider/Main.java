@@ -2,7 +2,7 @@ package org.dhbw.mosbach.ai.radio.provider;
 
 import org.dhbw.mosbach.ai.base.Radio.BroadcastConsumer;
 import org.dhbw.mosbach.ai.base.Radio.Configuration;
-import org.dhbw.mosbach.ai.base.Radio.RegisterOnRadio;
+import org.dhbw.mosbach.ai.radio.api.RadioSOAP;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import java.util.ArrayList;
 //EXAMPLE HOW TO USE THE RADIO
 public class Main {
     public static void main(String args[]){
+
 
 
         //RADIO MUST BE STARTED [not by client]
@@ -46,23 +47,25 @@ public class Main {
         //radio URL
         if (radioListener.getServiceURLs().size()>0) {
             String radioRegiURl = radioListener.getServiceURLs().get(0);
-            RegisterOnRadio registerOnRadio = new RegisterOnRadio(radioRegiURl);
+
+
+            RadioSOAP radioSOAP = null;
+            try {
+                radioSOAP = new RadioSOAP(radioRegiURl);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+
 
             //Register nameService
             String nameserviceURL = "http://nameserviceUrl/NameService";
-            try {
-                registerOnRadio.registrateURLOnRadio(Configuration.NameService_ContentType,nameserviceURL);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
+            radioSOAP.registerServiceAccess(Configuration.NameService_ContentType,nameserviceURL);
+
 
             //Register webservice
             String webServiceURL = "http://nameserviceUrl/NameService";
-            try {
-                registerOnRadio.registrateURLOnRadio(Configuration.Webserver_ContentType,webServiceURL);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
+            radioSOAP.registerServiceAccess(Configuration.Webserver_ContentType,webServiceURL);
+
 
         }
 

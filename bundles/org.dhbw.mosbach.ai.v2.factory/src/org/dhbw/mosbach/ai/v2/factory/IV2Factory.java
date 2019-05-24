@@ -1,14 +1,13 @@
-package org.dhbw.mosbach.ai.radio.api;
-
+package org.dhbw.mosbach.ai.v2.factory;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
-@WebService()
+@WebService
 @SOAPBinding(style = SOAPBinding.Style.RPC)
-public interface IRadio {
+public interface IV2Factory {
 
     @WebMethod
-    public void registerServiceAccess(String serviceTyp, String url);
+    public void createV2Cars(int count);
 }
