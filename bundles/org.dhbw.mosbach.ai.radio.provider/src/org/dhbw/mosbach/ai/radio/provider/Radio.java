@@ -2,11 +2,31 @@ package org.dhbw.mosbach.ai.radio.provider;
 
 import org.dhbw.mosbach.ai.base.Radio.Configuration;
 import org.dhbw.mosbach.ai.base.Radio.ServiceInformation;
+import org.dhbw.mosbach.ai.radio.api.IRadio;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 
 import java.net.Inet4Address;
 import java.util.ArrayList;
+import java.util.Map;
 
-public class Radio implements Runnable, IRegisterListener {
+@Component(name = "radio",service = IRadio.class)
+public class Radio implements Runnable, IRegisterListener  {
+
+
+    @Activate
+    public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
+        System.out.println("V2 booting ...");
+
+    }
+
+    @Deactivate
+    public void deactivate() {
+        System.out.println("V2 shutting down ...");
+    }
 
     BroadcastPublisher radioPublish;
     Thread radioThread;
