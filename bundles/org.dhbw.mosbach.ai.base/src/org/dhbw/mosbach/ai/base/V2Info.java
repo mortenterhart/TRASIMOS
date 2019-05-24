@@ -2,6 +2,7 @@ package org.dhbw.mosbach.ai.base;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement
 public class V2Info {
@@ -15,7 +16,7 @@ public class V2Info {
     @XmlAttribute(required = true)
     public double speed;
 
-    @XmlAttribute(required = true)
+    @XmlTransient
     public Position position;
 
 

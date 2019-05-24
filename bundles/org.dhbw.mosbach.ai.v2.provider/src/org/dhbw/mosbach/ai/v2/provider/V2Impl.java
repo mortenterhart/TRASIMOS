@@ -1,6 +1,7 @@
 package org.dhbw.mosbach.ai.v2.provider;
 
-import org.dhbw.mosbach.ai.base.Position;
+import org.dhbw.mosbach.ai.base.Radio.Configuration;
+import org.dhbw.mosbach.ai.base.*;
 import org.dhbw.mosbach.ai.base.V2Info;
 import org.dhbw.mosbach.ai.v2.api.IV2;
 import org.osgi.framework.BundleContext;
@@ -9,12 +10,20 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+import javax.xml.ws.Endpoint;
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.util.*;
 
 //import org.dhbw.mosbach.ai.base.Position;
 
+
+@WebService(endpointInterface = "org.dhbw.mosbach.ai.v2.api.IV2")
 @Component(name = "v2", service = IV2.class)
 public class V2Impl implements IV2 {
+
     private long id;
     private Position origin;
     private Position destination;
@@ -23,16 +32,31 @@ public class V2Impl implements IV2 {
     private double velocity;
     private ArrayList<Position> routePositions;
     private int nextRoutePositionIndex;
+    private String SOAPURL;
 
     private int TIMEOUT = 1;
 
-    public V2Impl(long id,double originLongitude, double originLatitude, double destinationLongitude, double destinationLatitude) {
+    public V2Impl(long id,double originLongitude, double originLatitude, double destinationLongitude, double destinationLatitude) throws UnknownHostException {
         this.id=id;
+        velocity=0.0;
         origin = new Position(originLongitude, originLatitude);
         destination = new Position(destinationLongitude, destinationLatitude);
         currentPosition = origin;
         routePositions = getRoutePositions();
         nextRoutePositionIndex = 0;
+
+        //Start SOAP
+        //generate random port
+        int port = (int)(Math.random()*(Configuration.V2PortMax-Configuration.V2PortMin))+Configuration.V2PortMin;
+        //build URL
+        String localIp = Inet4Address.getLocalHost().getHostAddress();
+        SOAPURL= Configuration.general_https+localIp+":"+port+"/"+id+"/"+Configuration.V2SOAP;
+        String SOAPPublish = Configuration.general_https+"0.0.0.0:"+port+"/"+id+"/"+Configuration.V2SOAP;
+        //Start Service
+        Object implementor = this;
+        Endpoint.publish(SOAPPublish, implementor);
+        System.out.println("OPENING V2-SOAP on "+SOAPURL);
+
     }
 
     @Activate
@@ -58,25 +82,34 @@ public class V2Impl implements IV2 {
         return abc;
     }
 
+    @WebMethod
     public Position getDestination() {
         return destination;
     }
 
+    @WebMethod
     public Position getOrigin() {
         return origin;
     }
 
+    @WebMethod
     @Override
     public V2Info getV2Information() {
         V2Info v2Info = new V2Info();
-        v2Info
+        v2Info.position = currentPosition;
+        v2Info.speed = velocity;
+        v2Info.SOAPURL= SOAPURL;
+        v2Info.V2id =id;
+        return v2Info;
     }
 
+    @WebMethod
     public Position getCurrentPosition() {
         return currentPosition;
     }
 
-    public int getId() {
+    @WebMethod
+    public long getId() {
         return id;
     }
 
@@ -112,6 +145,7 @@ public class V2Impl implements IV2 {
             }
         }
     }
+
 
     public void publishPosition() {
 
@@ -188,6 +222,8 @@ public class V2Impl implements IV2 {
 
         return new Position(longitude2, latitude2);
     }
+
+
 
 
 }
