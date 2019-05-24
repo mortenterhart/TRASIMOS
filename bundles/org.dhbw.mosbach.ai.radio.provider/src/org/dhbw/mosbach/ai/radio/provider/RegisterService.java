@@ -15,7 +15,7 @@ public class RegisterService implements IRadio,IRegisterProvider {
 
     @WebMethod
     @Override
-    public void registerServiceAccess(String url, String serviceTyp) {
+    public void registerServiceAccess(String serviceTyp, String url) {
         System.out.println("Service registered"+serviceTyp+":"+url);
         notifyListener(serviceTyp,url);
 

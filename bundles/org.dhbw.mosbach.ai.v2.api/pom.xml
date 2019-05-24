@@ -103,6 +103,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+
                         <!-- Enable processing of OSGi DS component and metatype annotations -->
                         <_dsannotaions>*</_dsannotaions>
                         <_metatypeannotations>*</_metatypeannotations>
