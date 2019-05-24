@@ -1,19 +1,21 @@
 package org.dhbw.mosbach.ai.v2.provider;
 
-import java.util.*;
-
-
+import org.dhbw.mosbach.ai.base.Position;
+import org.dhbw.mosbach.ai.base.V2Info;
 import org.dhbw.mosbach.ai.v2.api.IV2;
-//import org.dhbw.mosbach.ai.base.Position;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 
+import java.util.*;
+
+//import org.dhbw.mosbach.ai.base.Position;
+
 @Component(name = "v2", service = IV2.class)
 public class V2Impl implements IV2 {
-    private int id;
+    private long id;
     private Position origin;
     private Position destination;
     private Position currentPosition;
@@ -24,7 +26,8 @@ public class V2Impl implements IV2 {
 
     private int TIMEOUT = 1;
 
-    public V2Impl(double originLongitude, double originLatitude, double destinationLongitude, double destinationLatitude) {
+    public V2Impl(long id,double originLongitude, double originLatitude, double destinationLongitude, double destinationLatitude) {
+        this.id=id;
         origin = new Position(originLongitude, originLatitude);
         destination = new Position(destinationLongitude, destinationLatitude);
         currentPosition = origin;
@@ -61,6 +64,12 @@ public class V2Impl implements IV2 {
 
     public Position getOrigin() {
         return origin;
+    }
+
+    @Override
+    public V2Info getV2Information() {
+        V2Info v2Info = new V2Info();
+        v2Info
     }
 
     public Position getCurrentPosition() {
@@ -129,8 +138,8 @@ public class V2Impl implements IV2 {
         double distance = distance(x1, y1, x2, y2);
         double distanceV2CanDrive = velocity / 3.6;
         if (distance <= distanceV2CanDrive) {
-            currentPosition.setLatitude(x2);
-            currentPosition.setLongitude(y2);
+            currentPosition.latitude=x2;
+            currentPosition.longitude=y2;
         } else {
             if (x1 == x2) {
                 if (y1 < y2) {

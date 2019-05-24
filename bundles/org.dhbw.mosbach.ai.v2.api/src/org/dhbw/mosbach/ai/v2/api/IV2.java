@@ -1,6 +1,7 @@
 package org.dhbw.mosbach.ai.v2.api;
 
 import org.dhbw.mosbach.ai.base.Position;
+import org.dhbw.mosbach.ai.base.V2Info;
 
 public interface IV2 {
 
