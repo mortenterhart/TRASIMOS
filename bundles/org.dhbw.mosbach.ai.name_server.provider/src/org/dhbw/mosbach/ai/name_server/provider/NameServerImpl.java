@@ -28,11 +28,15 @@ public class NameServerImpl implements INameServer {
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
         System.out.println("Name Server booting ...");
         
+		Object implementor = new NameServerImpl();
+		String address = "http://localhost:9001/NameServer";
+		Endpoint.publish(address, implementor);
+        
         wholeMap = new MapChunk();
-        wholeMap.setTopLeft(new Position(0, 0));
-        wholeMap.setTopRight(new Position(0, 0));
-        wholeMap.setBottomRight(new Position(0, 0));
-        wholeMap.setBottomLeft(new Position(0, 0));
+        wholeMap.setTopLeft(new Position(49.8000, 9.0000));
+        wholeMap.setTopRight(new Position(49.8000, 9.5000));
+        wholeMap.setBottomLeft(new Position(49.3000, 9.000));
+        wholeMap.setBottomRight(new Position(49.3000, 9.5000));
     }
 
     @Deactivate
@@ -81,12 +85,5 @@ public class NameServerImpl implements INameServer {
 		}
 		
 		return url;
-	}
-
-	public static void main(String args[]){
-			Object implementor = new NameServerImpl();
-			String address = "http://localhost:9001/NameServer";
-			Endpoint.publish(address, implementor);
-
 	}
 }
