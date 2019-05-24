@@ -1,6 +1,7 @@
 package org.dhbw.mosbach.ai.information_system.api;
 
 import org.dhbw.mosbach.ai.base.Position;
+import org.dhbw.mosbach.ai.base.V2Info;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
@@ -13,14 +14,14 @@ import java.util.ArrayList;
 public interface IInformationSystem {
 
     @WebMethod
-    public boolean receivePosition(long v2Id, Position position);
+    public boolean receivePosition(V2Info v2Info);
 
     @WebMethod
-    public ArrayList<Position> getNeighbours(long v2Id, double speed);
+    public ArrayList<V2Info> getNeighbours(V2Info v2Info);
 
     @WebMethod
-    public ArrayList<Position> getNeighbours(Position position, double radius);
+    public ArrayList<V2Info> getNeighbours(Position position, double radius);
 
     @WebMethod
-    public void receiveFinished(long v2Id);
+    public void receiveFinished(V2Info v2Info);
 }
