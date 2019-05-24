@@ -6,6 +6,12 @@ public class Configuration {
 
     public static String general_Seperation = ";";
 
+    public static double root00_mappoint_lang = 0;
+    public static double root00_mappoint_lat = 0;
+
+    public static double root11_mapppoint_lang = 2;
+    public static double root11_mapppoint_lat = 2;
+
 
     //Radio Multicast Group
     public static String Radio_multiCastAddress = "224.0.0.1";

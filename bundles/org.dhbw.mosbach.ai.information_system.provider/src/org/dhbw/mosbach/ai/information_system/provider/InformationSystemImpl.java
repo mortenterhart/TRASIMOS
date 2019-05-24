@@ -61,8 +61,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
      * get neighbours of vehicle by its id and speed.
      * requres that vehicle is observed by this information system
      *
-     * @param v2Id  id of v2 vehicle
-     * @param speed speed of v2 vehicle
+     * @param v2Info  info of v2 vehicle
      * @return list of positions of neighbours
      */
     @Override
@@ -103,7 +102,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
         for (V2Info info : vehiclesToObserve.values()) {
             if (distanceBetweenPositions(position, info.position) <= radius) {
-                positionOfNeighbours.add(info.position);
+                positionOfNeighbours.add(info);
             }
         }
 
@@ -113,7 +112,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     /**
      * remove vehicle from observing
      *
-     * @param v2Id id of v2 vehicle
+     * @param v2Info id of v2 vehicle
      */
     @Override
     @WebMethod
@@ -202,12 +201,6 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         //Make some cool Queries
         while (true) {
 
-            System.out.println("CLIENT: TRYING TO PUBLISH MY POSITION ID= " + 392193129);
-            Position position = new Position();
-            position.longitude = 2313;
-            position.latitude = 2323;
-            boolean succes = iInformationSystem.receivePosition(392193129, position);
-            System.out.println("CLIENT: Publish Position worked out: " + succes);
         }
     }
 

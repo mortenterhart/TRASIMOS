@@ -2,6 +2,7 @@ package org.dhbw.mosbach.ai.information_system.api;
 
 import org.dhbw.mosbach.ai.base.Position;
 import org.dhbw.mosbach.ai.base.Radio.Configuration;
+import org.dhbw.mosbach.ai.base.V2Info;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -22,23 +23,24 @@ public class InformationSOAP implements IInformationSystem {
         informationSystem  = service.getPort(IInformationSystem.class);
     }
 
+
     @Override
-    public boolean receivePosition(long v2Id, Position position) {
-        return informationSystem.receivePosition(v2Id,position);
+    public boolean receivePosition(V2Info v2Info) {
+        return informationSystem.receivePosition(v2Info);
     }
 
     @Override
-    public ArrayList<Position> getNeighbours(long v2Id, double speed) {
-        return informationSystem.getNeighbours(v2Id,speed);
+    public ArrayList<V2Info> getNeighbours(V2Info v2Info) {
+        return informationSystem.getNeighbours(v2Info);
     }
 
     @Override
-    public ArrayList<Position> getNeighbours(Position position, double radius) {
+    public ArrayList<V2Info> getNeighbours(Position position, double radius) {
         return informationSystem.getNeighbours(position,radius);
     }
 
     @Override
-    public void receiveFinished(long v2Id) {
-        informationSystem.receiveFinished(v2Id);
+    public void receiveFinished(V2Info v2Info) {
+        informationSystem.receiveFinished(v2Info);
     }
 }
