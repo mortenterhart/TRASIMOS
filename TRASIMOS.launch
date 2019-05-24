@@ -25,5 +25,5 @@
     <booleanAttribute key="tracing" value="false"/>
     <booleanAttribute key="useCustomFeatures" value="false"/>
     <booleanAttribute key="useDefaultConfigArea" value="true"/>
-    <stringAttribute key="workspace_bundles" value="org.dhbw.mosbach.ai.information_system.api@default:default,org.dhbw.mosbach.ai.information_system.provider@default:default,org.dhbw.mosbach.ai.name_server.api@default:default,org.dhbw.mosbach.ai.name_server.provider@default:default,org.dhbw.mosbach.ai.v2.api@default:default,org.dhbw.mosbach.ai.v2.provider@default:default,org.dhbw.mosbach.ai.webserver.api@default:default,org.dhbw.mosbach.ai.webserver.provider@default:default"/>
+    <stringAttribute key="workspace_bundles" value="org.dhbw.mosbach.ai.base@default:default,org.dhbw.mosbach.ai.information_system.api@default:default,org.dhbw.mosbach.ai.information_system.provider@default:default,org.dhbw.mosbach.ai.name_server.api@default:default,org.dhbw.mosbach.ai.name_server.provider@default:default,org.dhbw.mosbach.ai.radio.api@default:default,org.dhbw.mosbach.ai.radio.provider@default:default,org.dhbw.mosbach.ai.v2.api@default:default,org.dhbw.mosbach.ai.v2.factory@default:default,org.dhbw.mosbach.ai.v2.provider@default:default,org.dhbw.mosbach.ai.webserver.api@default:default,org.dhbw.mosbach.ai.webserver.provider@default:default"/>
 </launchConfiguration>
