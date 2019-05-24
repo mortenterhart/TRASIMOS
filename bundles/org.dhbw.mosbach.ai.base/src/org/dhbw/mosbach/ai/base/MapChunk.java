@@ -63,10 +63,10 @@ public class MapChunk {
     }
 
     public boolean isWithin(Position p) {
-        if (topLeft.getLatitude() >= p.getLatitude() && p.getLatitude() >= bottomLeft.getLatitude()) {
-            if (topLeft.getLongitude() <= topRight.getLongitude() && topLeft.getLongitude() <= p.getLongitude() && p.getLongitude() <= topRight.getLongitude()) {
+        if (topLeft.latitude >= p.latitude && p.latitude >= bottomLeft.latitude) {
+            if (topLeft.longitude <= topRight.longitude && topLeft.longitude <= p.longitude && p.longitude <= topRight.longitude) {
                 return true;
-            } else if (topLeft.getLongitude() > topRight.getLongitude() && (topLeft.getLongitude() <= p.getLongitude() || p.getLongitude() <= topRight.getLongitude())) {
+            } else if (topLeft.longitude > topRight.longitude && (topLeft.longitude <= p.longitude || p.longitude <= topRight.longitude)) {
                 return true;
             }
         }
