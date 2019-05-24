@@ -17,7 +17,6 @@ public class V2FactorySOAP implements IV2Factory{
         factoryService = factory.getPort(IV2Factory.class);
     }
 
-
     @Override
     public void createV2Cars(int count) {
         factoryService.createV2Cars(count);
