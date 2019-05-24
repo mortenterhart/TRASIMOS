@@ -15,8 +15,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
-
-import java.net.MalformedURLException;
+import java.net.Inet4Address;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,11 +52,15 @@ public class NameServerImpl implements INameServer {
         	String radioRegiURl = radioListener.getServiceURLs().get(0);
         	RegisterOnRadio registerOnRadio = new RegisterOnRadio(radioRegiURl);
 
-        	//Register nameService
-        	String nameserviceURL = "http://0.0.0.0:9001/NameServer";
+
         	try {
-        		registerOnRadio.registrateURLOnRadio(Configuration.NameService_ContentType, nameserviceURL);
-        	} catch (MalformedURLException e) {
+
+                String localIp = Inet4Address.getLocalHost().getHostAddress();
+                //Register nameService
+                String nameserviceURL = "http://"+localIp+":9001/NameServer";
+
+                registerOnRadio.registrateURLOnRadio(Configuration.NameService_ContentType, nameserviceURL);
+        	} catch (Exception e) {
         		e.printStackTrace();
         	}
         }

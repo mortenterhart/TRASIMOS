@@ -20,6 +20,7 @@ public class Configuration {
     public static int NameService_multiCastPort = 50001;
     public static final String NameService_ContentType = "nameservice";
     public static final int NameService_Delay_Broadcast = 200;
+    public static final String NameSrvice_url = ":30000/Nameservice";
 
     public static String Webserver_multiCastAddress = "224.0.0.3";
     public static int Webserver_multiCastPort = 50002;
