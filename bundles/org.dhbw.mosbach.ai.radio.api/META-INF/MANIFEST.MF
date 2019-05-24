@@ -6,3 +6,4 @@ Bundle-Version: 1.0.0
 Automatic-Module-Name: org.dhbw.mosbach.ai.radio.api
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Export-Package: org.dhbw.mosbach.ai.radio.api;version="1.0.0"
+Automatic-Module-Name: org.dhbw.mosbach.ai.radio.api
