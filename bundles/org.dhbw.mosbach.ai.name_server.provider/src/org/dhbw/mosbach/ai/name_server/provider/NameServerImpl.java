@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+
 import org.dhbw.mosbach.ai.base.MapChunk;
 import org.dhbw.mosbach.ai.name_server.api.INameServer;
 import org.dhbw.mosbach.ai.base.Position;
@@ -14,6 +17,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 
+@WebService(endpointInterface = "org.dhbw.mosbach.ai.name_server.api.INameServer")
 @Component(name = "name-server", service = INameServer.class)
 public class NameServerImpl implements INameServer {
 	
@@ -37,6 +41,7 @@ public class NameServerImpl implements INameServer {
     }
 
 	@Override
+	@WebMethod
 	public String registerInfoServer(String url) {
 		String boundaries = null;
 		switch(infoServers.size()) {
@@ -60,6 +65,7 @@ public class NameServerImpl implements INameServer {
 	}
 
 	@Override
+	@WebMethod
 	public String getInfoServer(Position position) {
 		
 		String url = "";
