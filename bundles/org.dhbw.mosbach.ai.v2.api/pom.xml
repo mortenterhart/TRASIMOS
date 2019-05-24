@@ -103,7 +103,9 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-
+                        <Export-Bundle>
+                            org.dhbw.mosbach.ai.v2.api;version=1.0.0
+                        </Export-Bundle>
                         <!-- Enable processing of OSGi DS component and metatype annotations -->
                         <_dsannotaions>*</_dsannotaions>
                         <_metatypeannotations>*</_metatypeannotations>

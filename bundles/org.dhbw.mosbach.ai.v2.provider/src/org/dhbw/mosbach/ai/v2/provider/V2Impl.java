@@ -36,6 +36,10 @@ public class V2Impl implements IV2,Runnable {
 
     private int TIMEOUT = 1;
 
+    public V2Impl(){
+
+    }
+
     public V2Impl(long id,double originLongitude, double originLatitude, double destinationLongitude, double destinationLatitude) throws UnknownHostException {
         this.id=id;
         velocity=0.0;
