@@ -27,4 +27,11 @@ public class Configuration {
     public static final String Webserver_ContentType = "webserver";
     public static final int Webserver_Delay_Broadcast = 200;
 
+
+    //V2 Webservice
+    //URL = Configuration.general_https+ <ID> + port (between V2PortMin and V2PortMax) + Configuration.V2SOAP
+    public static String V2SOAP = "/V2InfoService";
+    public static int V2PortMin = 30000;
+    public static int V2PortMax = 40000;
+
 }
