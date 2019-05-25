@@ -6,19 +6,20 @@ Bundle-Version: 1.0.0
 Automatic-Module-Name: org.dhbw.mosbach.ai.v2.factory
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Service-Component: OSGI-INF/v2-factory.xml
-Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.osgi;bundle-version="3.13.300",
  org.eclipse.osgi.services;bundle-version="3.8.0"
-Import-Package: org.dhbw.mosbach.ai.base.Radio,
+Import-Package: org.dhbw.mosbach.ai.base.Radio;version="1.0.0",
  org.dhbw.mosbach.ai.v2.api;version="1.0.0",
- org.dhbw.mosbach.ai.v2.provider
+ org.dhbw.mosbach.ai.v2.provider;version="1.0.0",
+ org.osgi.service.component.annotations;version="1.3.0"
 Export-Package: org.apache.cxf.endpoint.dynamic,
  org.apache.cxf.jaxb,
  org.apache.cxf.jaxb.attachment,
  org.apache.cxf.jaxb.io,
- org.dhbw.mosbach.ai.v2.factory
+ org.dhbw.mosbach.ai.v2.factory;version="1.0.0"
 Bundle-ClassPath: lib/cxf-rt-databinding-jaxb-3.3.2.jar,
  lib/javax.jws-api-1.1.jar,
  lib/jaxws-api-2.3.1.jar,
  lib/org.osgi.annotation-6.0.0.jar,
- lib/rt-2.3.2.jar
+ lib/rt-2.3.2.jar,
+ bin/
