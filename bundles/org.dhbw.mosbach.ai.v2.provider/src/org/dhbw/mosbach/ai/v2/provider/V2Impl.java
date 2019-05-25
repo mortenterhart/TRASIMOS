@@ -1,5 +1,9 @@
 package org.dhbw.mosbach.ai.v2.provider;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.dhbw.mosbach.ai.base.Position;
 import org.dhbw.mosbach.ai.base.Radio.BroadcastConsumer;
 import org.dhbw.mosbach.ai.base.Radio.Configuration;
@@ -12,13 +16,16 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import org.springframework.remoting.support.UrlBasedRemoteAccessor;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
+import javax.swing.text.html.parser.Parser;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Inet4Address;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,24 +34,25 @@ import java.util.*;
 
 //import org.dhbw.mosbach.ai.base.Position;
 
-
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.v2.api.IV2")
 @Component(name = "v2", service = IV2.class)
 public class V2Impl implements IV2, Runnable {
 
+    static class Route{
+        private ArrayList<Position> routePositions;
+    }
     private long id;
     private Position origin;
     private Position destination;
     private Position currentPosition;
     private Position direction;
     private double velocity;
-    private ArrayList<Position> routePositions;
     private int nextRoutePositionIndex;
     private String SOAPURL;
     private String infoWsdl;
     private int TIMEOUT = 1;
     private double maxVelocity;
-
+    private Route routeList;
     public V2Impl() {
 
     }
@@ -106,20 +114,41 @@ public class V2Impl implements IV2, Runnable {
         System.out.println("V2 shutting down ...");
     }
 
-
     //USE API
-    public ArrayList<Position> getRoutePositions() {
-        Position a = new Position(49.303717, 9.002668);
-        Position b = new Position(49.30481, 8.999361);
-        Position c = new Position(49.313765, 8.998264);
-        ArrayList<Position> abc = new ArrayList<>();
-        abc.add(a);
-        abc.add(b);
-        abc.add(c);
+    public String getRoutePositions() throws IOException {
+        JsonParser parser = new JsonParser();
 
-        return abc;
+        String json = readUrl();
+        Gson gson = new Gson();
+        JsonElement jsonObject =  parser.parse(json);
+        JsonObject details = jsonObject.getAsJsonObject();
+
+        JsonElement route = details.get("coordinates");
+
+        //TODO: map coordinates to List of Positions
+        return "ha";
     }
 
+    public String readUrl() throws IOException {
+        BufferedReader reader = null;
+        String urlString = "http://141.72.191.30:5000/route/v1/driving/"
+                + origin.longitude + "," + origin.latitude + ";" + destination.longitude + "," + destination.latitude +
+                "?steps=true&alternatives=true&geometries=geojson";
+        try {
+            URL url = new URL(urlString);
+            reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            StringBuffer buffer = new StringBuffer();
+            int read;
+            char[] chars = new char[1024];
+            while ((read = reader.read(chars)) != -1)
+                buffer.append(chars, 0, read);
+
+            return buffer.toString();
+        } finally {
+            if (reader != null)
+                reader.close();
+        }
+    }
     @WebMethod
     public Position getDestination() {
         return destination;
@@ -132,8 +161,8 @@ public class V2Impl implements IV2, Runnable {
 
     @WebMethod
     public void reduceSpeed() {
-        if(velocity >= 10.0){
-           velocity-= 5.0;
+        if (velocity >= 10.0) {
+            velocity -= 5.0;
         }
     }
 
@@ -340,4 +369,6 @@ public class V2Impl implements IV2, Runnable {
             getInformationService(infoWsdl, currentPosition);
         }
     }
+
+    private
 }
