@@ -178,7 +178,7 @@ public class V2Impl implements IV2, Runnable {
                 }
                 while (currentPosition.getLatitude() != routePositions.get(nextRoutePositionIndex).getLatitude()) {
                     Thread.sleep(TIMEOUT);
-                    //diceBraking(); //this would be fun, for sure
+                    //diceBraking(); this would be fun, for sure
                     properBraking();
                     accelerate();
                     drive(
@@ -214,7 +214,7 @@ public class V2Impl implements IV2, Runnable {
             ) {
                 //Connection to other V2 (Questanable if this even work @captainblubb)
                 URL v2Url = new URL(v2Info.SOAPURL);
-                QName qName = new QName("TODO add namespace", String.valueOf(v2Info.V2id));
+                QName qName = new QName("http://provider.v2.ai.mosbach.dhbw.org/", String.valueOf(v2Info.V2id));
                 Service service = Service.create(v2Url, qName);
                 IV2 otherV2Service = service.getPort(IV2.class); // inspections says getPorts() can´t be applied
                 otherV2Service.reduceSpeed();
