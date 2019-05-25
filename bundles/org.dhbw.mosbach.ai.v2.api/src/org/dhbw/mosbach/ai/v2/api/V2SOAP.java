@@ -43,8 +43,8 @@ public class V2SOAP implements IV2{
     }
 
     @Override
-    public void reduceSpeed(double distance) {
-        iv2.reduceSpeed(distance);
+    public void reduceSpeed() {
+        iv2.reduceSpeed();
     }
 
     @Override

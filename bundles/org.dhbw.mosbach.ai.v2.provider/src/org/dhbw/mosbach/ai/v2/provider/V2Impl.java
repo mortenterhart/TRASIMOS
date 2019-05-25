@@ -12,12 +12,16 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.springframework.remoting.support.UrlBasedRemoteAccessor;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
+import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.Service;
 import java.net.Inet4Address;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.*;
 
@@ -95,7 +99,6 @@ public class V2Impl implements IV2, Runnable {
         // RadioClient -> NameServer -> InformationServer
         ArrayList<String> nameServer = getNameServerUrl();
         infoWsdl = getInformationService(wsdl, currentPosition);
-
     }
 
     @Deactivate
@@ -128,8 +131,10 @@ public class V2Impl implements IV2, Runnable {
     }
 
     @WebMethod
-    public void reduceSpeed(double distance) {
-
+    public void reduceSpeed() {
+        if(velocity >= 10.0){
+           velocity-= 5.0;
+        }
     }
 
     @WebMethod
@@ -192,19 +197,36 @@ public class V2Impl implements IV2, Runnable {
     }
 
     private void accelerate() {
-        if(velocity <= maxVelocity){
+        if (velocity <= maxVelocity) {
             velocity++;
         }
     }
 
-    private void properBraking() {
+    private void properBraking() throws MalformedURLException {
+        ArrayList<V2Info> v2InfoArrayList = getNeighboursFromInfo(infoWsdl);
+        for (V2Info v2Info :
+                v2InfoArrayList) {
+            if (1000 < distance(
+                    v2Info.position.latitude,
+                    v2Info.position.longitude,
+                    currentPosition.latitude,
+                    currentPosition.longitude)
+            ) {
+                //Connection to other V2 (Questanable if this even work @captainblubb)
+                URL v2Url = new URL(v2Info.SOAPURL);
+                QName qName = new QName("TODO add namespace", String.valueOf(v2Info.V2id));
+                Service service = Service.create(v2Url, qName);
+                IV2 otherV2Service = (IV2) service.getPorts(IV2.class); // inspections says getPorts() can´t be applied
+                otherV2Service.reduceSpeed();
+            }
+        }
     }
 
     public List<Position> retrieveNeighbours() {
         return new ArrayList<>();
     }
 
-    public void diceBraking() {
+    private void diceBraking() {
         if (!retrieveNeighbours().isEmpty()) {
             Random r = new Random();
             try {
@@ -318,11 +340,4 @@ public class V2Impl implements IV2, Runnable {
             getInformationService(infoWsdl, currentPosition);
         }
     }
-
-
-    /*
-            getInformationService // Am Anfang aufgerufen, immer wenn
-     */
-
-
 }

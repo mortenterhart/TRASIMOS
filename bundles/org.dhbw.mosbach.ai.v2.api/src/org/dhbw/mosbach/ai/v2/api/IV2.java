@@ -24,7 +24,7 @@ public interface IV2 {
    Position getOrigin();
 
    @WebMethod
-   void reduceSpeed(double distance);
+   void reduceSpeed();
 
    @WebMethod
    long getId();
