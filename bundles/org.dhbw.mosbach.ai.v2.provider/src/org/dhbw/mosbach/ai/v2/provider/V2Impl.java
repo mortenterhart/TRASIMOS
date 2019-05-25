@@ -26,7 +26,7 @@ import java.util.*;
 
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.v2.api.IV2")
 @Component(name = "v2", service = IV2.class)
-public class V2Impl implements IV2,Runnable {
+public class V2Impl implements IV2, Runnable {
 
     private long id;
     private Position origin;
@@ -37,10 +37,11 @@ public class V2Impl implements IV2,Runnable {
     private ArrayList<Position> routePositions;
     private int nextRoutePositionIndex;
     private String SOAPURL;
-
+    private String infoWsdl;
     private int TIMEOUT = 1;
+    private double maxVelocity;
 
-    public V2Impl(){
+    public V2Impl() {
 
     }
 
@@ -48,9 +49,10 @@ public class V2Impl implements IV2,Runnable {
     BroadcastConsumer webListener;
 
 
-    public V2Impl(long id,double originLongitude, double originLatitude, double destinationLongitude, double destinationLatitude) throws UnknownHostException {
-        this.id=id;
-        velocity=0.0;
+    public V2Impl(long id, double originLongitude, double originLatitude, double destinationLongitude, double destinationLatitude, double maxVelocity) throws UnknownHostException {
+        this.id = id;
+        velocity = 0.0;
+        this.maxVelocity = maxVelocity;
         origin = new Position(originLongitude, originLatitude);
         destination = new Position(destinationLongitude, destinationLatitude);
         currentPosition = origin;
@@ -58,48 +60,42 @@ public class V2Impl implements IV2,Runnable {
         nextRoutePositionIndex = 0;
 
         //2. Listen to Nameserver
-        nameListener = new BroadcastConsumer(Configuration.NameService_multiCastAddress,Configuration.NameService_multiCastPort);
+        nameListener = new BroadcastConsumer(Configuration.NameService_multiCastAddress, Configuration.NameService_multiCastPort);
         Thread nameListenerThread = new Thread(nameListener);
         nameListenerThread.start();
 
         //3. Listen to Webserver
-        webListener = new BroadcastConsumer(Configuration.Webserver_multiCastAddress,Configuration.Webserver_multiCastPort);
+        webListener = new BroadcastConsumer(Configuration.Webserver_multiCastAddress, Configuration.Webserver_multiCastPort);
         Thread webListenerThread = new Thread(webListener);
         webListenerThread.start();
 
 
         //Start SOAP
         //generate random port
-        int port = (int)(Math.random()*(Configuration.V2PortMax-Configuration.V2PortMin))+Configuration.V2PortMin;
+        int port = (int) (Math.random() * (Configuration.V2PortMax - Configuration.V2PortMin)) + Configuration.V2PortMin;
         //build URL
-
-
-
 
         String localIp = Inet4Address.getLocalHost().getHostAddress();
 
-        SOAPURL= Configuration.general_https+localIp+":"+port+"/"+id+"/"+Configuration.V2SOAP;
+        SOAPURL = Configuration.general_https + localIp + ":" + port + "/" + id + "/" + Configuration.V2SOAP;
 
-
-        String SOAPPublish = Configuration.general_https+"0.0.0.0:"+port+"/"+id+"/"+Configuration.V2SOAP;
-
-
-
-
-
+        String SOAPPublish = Configuration.general_https + "0.0.0.0:" + port + "/" + id + "/" + Configuration.V2SOAP;
 
 
         //Start Service
         Object implementor = this;
         Endpoint.publish(SOAPPublish, implementor);
-        System.out.println("OPENING V2-SOAP on "+SOAPURL);
+        System.out.println("OPENING V2-SOAP on " + SOAPURL);
 
     }
 
     @Activate
-    public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
+    public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties, String wsdl) throws MalformedURLException {
         System.out.println("V2 booting ...");
         // RadioClient -> NameServer -> InformationServer
+        ArrayList<String> nameServer = getNameServerUrl();
+        infoWsdl = getInformationService(wsdl, currentPosition);
+
     }
 
     @Deactivate
@@ -142,8 +138,8 @@ public class V2Impl implements IV2,Runnable {
         V2Info v2Info = new V2Info();
         v2Info.position = currentPosition;
         v2Info.speed = velocity;
-        v2Info.SOAPURL= SOAPURL;
-        v2Info.V2id =id;
+        v2Info.SOAPURL = SOAPURL;
+        v2Info.V2id = id;
         v2Info.direction = direction;
         return v2Info;
     }
@@ -177,23 +173,31 @@ public class V2Impl implements IV2,Runnable {
                 }
                 while (currentPosition.getLatitude() != routePositions.get(nextRoutePositionIndex).getLatitude()) {
                     Thread.sleep(TIMEOUT);
-                    publishPosition();
                     diceBraking();
+                    //properBraking();
+                    accelerate();
                     drive(
                             currentPosition.getLatitude(), currentPosition.getLongitude(),
                             routePositions.get(nextRoutePositionIndex).getLatitude(), currentPosition.getLongitude()
                     );
                 }
+                publishPosition();
                 nextRoutePositionIndex++;
             } catch (InterruptedException exc) {
                 exc.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
             }
         }
     }
 
+    private void accelerate() {
+        if(velocity <= maxVelocity){
+            velocity++;
+        }
+    }
 
-    public void publishPosition() {
-
+    private void properBraking() {
     }
 
     public List<Position> retrieveNeighbours() {
@@ -217,8 +221,8 @@ public class V2Impl implements IV2,Runnable {
         double distance = distance(x1, y1, x2, y2);
         double distanceV2CanDrive = velocity / 3.6;
         if (distance <= distanceV2CanDrive) {
-            currentPosition.latitude=x2;
-            currentPosition.longitude=y2;
+            currentPosition.latitude = x2;
+            currentPosition.longitude = y2;
         } else {
             if (x1 == x2) {
                 if (y1 < y2) {
@@ -262,72 +266,63 @@ public class V2Impl implements IV2,Runnable {
         latitude = Math.toRadians(latitude); //Current lat point converted to radians
         longitude = Math.toRadians(longitude); //Current long point converted to radians
 
-        double latitude2 = Math.asin(Math.sin(latitude) * Math.cos(d/R) + Math.cos(latitude) * Math.sin(d/R) * Math.cos(bearing));
-        double longitude2 = longitude + Math.atan2(Math.sin(bearing) * Math.sin(d/R) * Math.cos(latitude), Math.cos(d/R) - Math.sin(latitude) * Math.sin(latitude2));
+        double latitude2 = Math.asin(Math.sin(latitude) * Math.cos(d / R) + Math.cos(latitude) * Math.sin(d / R) * Math.cos(bearing));
+        double longitude2 = longitude + Math.atan2(Math.sin(bearing) * Math.sin(d / R) * Math.cos(latitude), Math.cos(d / R) - Math.sin(latitude) * Math.sin(latitude2));
 
         return new Position(longitude2, latitude2);
     }
 
 
-
     //GET URLS OF ALL NAMESERVICES; WILL ONLY BE ONE BUT FOR FUTURE !!
-    public ArrayList<String> getNameServerUrl(){
+    public ArrayList<String> getNameServerUrl() {
 
-        if(nameListener.isServiceFound()){
-           return nameListener.getServiceURLs();
+        if (nameListener.isServiceFound()) {
+            return nameListener.getServiceURLs();
         }
         return new ArrayList<>();
     }
 
     //GET URLS OF ALL NAMESERVICES; WILL ONLY BE ONE BUT FOR FUTURE !!
-    public ArrayList<String> getWebserverUrl(){
+    public ArrayList<String> getWebserverUrl() {
 
-        if(webListener.isServiceFound()){
+        if (webListener.isServiceFound()) {
             return webListener.getServiceURLs();
         }
         return new ArrayList<>();
     }
 
-    public boolean publishPositionToWebserver(String wsdl){
+    public boolean publishPositionToWebserver(String wsdl) {
         // TODO: cant implement yet
         return true;
     }
 
-
-
     //GET URL TO INFOSERVIE @PARAM url of nameservice and current position
-    public String getInformationService(String wsdl,Position position) throws MalformedURLException {
-            NameServerSOAP nameServerSOAP = new NameServerSOAP(wsdl);
-            return nameServerSOAP.getInfoServer(position);
+    public String getInformationService(String wsdl, Position position) throws MalformedURLException {
+        NameServerSOAP nameServerSOAP = new NameServerSOAP(wsdl);
+        return nameServerSOAP.getInfoServer(position);
     }
 
     //Publish position to @Param url to Inforservice return false => get new Infoservice
-    public boolean publishPositionToInfo(String wsdl) throws MalformedURLException {
-
+    public boolean publishPositionToInfoserver(String wsdl) throws MalformedURLException {
         InformationSOAP informationSOAP = new InformationSOAP(wsdl);
         return informationSOAP.receivePosition(getV2Information());
-
     }
 
     public ArrayList<V2Info> getNeighboursFromInfo(String wsdl) throws MalformedURLException {
-
         InformationSOAP informationSOAP = new InformationSOAP(wsdl);
         return informationSOAP.getNeighbours(getV2Information());
-
     }
 
-
+    private void publishPosition() throws MalformedURLException {
+        if (!publishPositionToInfoserver(infoWsdl)) {
+            getInformationService(infoWsdl, currentPosition);
+        }
+    }
 
 
     /*
             getInformationService // Am Anfang aufgerufen, immer wenn
-
-
-
-
      */
-
-
 
 
 }
