@@ -1,14 +1,27 @@
 package org.dhbw.mosbach.ai.information_system.api;
 
 import org.dhbw.mosbach.ai.base.Position;
+import org.dhbw.mosbach.ai.base.V2Info;
 
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+import javax.jws.soap.SOAPBinding;
+import java.util.ArrayList;
+
+
+@WebService
+@SOAPBinding(style = SOAPBinding.Style.RPC)
 public interface IInformationSystem {
 
-    public void receivePosition(long v2Id, Position position);
+    @WebMethod
+    public boolean receivePosition(V2Info v2Info);
 
-    public void getNeighbours(long v2Id, double speed);
+    @WebMethod
+    public ArrayList<V2Info> getNeighbours(V2Info v2Info);
 
-    public void overtakeInformationService(Position position00, Position position10, Position position01, Position position11);
+    @WebMethod
+    public ArrayList<V2Info> getNeighbours(Position position, double radius);
 
-    public void receiveFinished(long v2Id);
+    @WebMethod
+    public void receiveFinished(V2Info v2Info);
 }

@@ -14,9 +14,9 @@ public class Main {
 
 
         //RADIO MUST BE STARTED [not by client]
-        //Radio radio = new Radio();
-        //Thread radioT = new Thread(radio);
-        //radioT.start();
+        Radio radio = new Radio();
+        Thread radioT = new Thread(radio);
+        radioT.start();
 
 
         //CLIENT
