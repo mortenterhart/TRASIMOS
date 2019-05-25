@@ -1,8 +1,11 @@
 package org.dhbw.mosbach.ai.v2.provider;
 
+import org.dhbw.mosbach.ai.base.Position;
+import org.dhbw.mosbach.ai.base.Radio.BroadcastConsumer;
 import org.dhbw.mosbach.ai.base.Radio.Configuration;
-import org.dhbw.mosbach.ai.base.*;
 import org.dhbw.mosbach.ai.base.V2Info;
+import org.dhbw.mosbach.ai.information_system.api.InformationSOAP;
+import org.dhbw.mosbach.ai.name_server.api.NameServerSOAP;
 import org.dhbw.mosbach.ai.v2.api.IV2;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -14,6 +17,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 import java.net.Inet4Address;
+import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.*;
 
@@ -28,7 +32,7 @@ public class V2Impl implements IV2,Runnable {
     private Position origin;
     private Position destination;
     private Position currentPosition;
-    private Vector<Long> direction;
+    private Position direction;
     private double velocity;
     private ArrayList<Position> routePositions;
     private int nextRoutePositionIndex;
@@ -40,6 +44,10 @@ public class V2Impl implements IV2,Runnable {
 
     }
 
+    BroadcastConsumer nameListener;
+    BroadcastConsumer webListener;
+
+
     public V2Impl(long id,double originLongitude, double originLatitude, double destinationLongitude, double destinationLatitude) throws UnknownHostException {
         this.id=id;
         velocity=0.0;
@@ -49,13 +57,38 @@ public class V2Impl implements IV2,Runnable {
         routePositions = getRoutePositions();
         nextRoutePositionIndex = 0;
 
+        //2. Listen to Nameserver
+        nameListener = new BroadcastConsumer(Configuration.NameService_multiCastAddress,Configuration.NameService_multiCastPort);
+        Thread nameListenerThread = new Thread(nameListener);
+        nameListenerThread.start();
+
+        //3. Listen to Webserver
+        webListener = new BroadcastConsumer(Configuration.Webserver_multiCastAddress,Configuration.Webserver_multiCastPort);
+        Thread webListenerThread = new Thread(webListener);
+        webListenerThread.start();
+
+
         //Start SOAP
         //generate random port
         int port = (int)(Math.random()*(Configuration.V2PortMax-Configuration.V2PortMin))+Configuration.V2PortMin;
         //build URL
+
+
+
+
         String localIp = Inet4Address.getLocalHost().getHostAddress();
+
         SOAPURL= Configuration.general_https+localIp+":"+port+"/"+id+"/"+Configuration.V2SOAP;
+
+
         String SOAPPublish = Configuration.general_https+"0.0.0.0:"+port+"/"+id+"/"+Configuration.V2SOAP;
+
+
+
+
+
+
+
         //Start Service
         Object implementor = this;
         Endpoint.publish(SOAPPublish, implementor);
@@ -74,6 +107,8 @@ public class V2Impl implements IV2,Runnable {
         System.out.println("V2 shutting down ...");
     }
 
+
+    //USE API
     public ArrayList<Position> getRoutePositions() {
         Position a = new Position(49.303717, 9.002668);
         Position b = new Position(49.30481, 8.999361);
@@ -97,6 +132,11 @@ public class V2Impl implements IV2,Runnable {
     }
 
     @WebMethod
+    public void reduceSpeed(double distance) {
+
+    }
+
+    @WebMethod
     @Override
     public V2Info getV2Information() {
         V2Info v2Info = new V2Info();
@@ -104,6 +144,7 @@ public class V2Impl implements IV2,Runnable {
         v2Info.speed = velocity;
         v2Info.SOAPURL= SOAPURL;
         v2Info.V2id =id;
+        v2Info.direction = direction;
         return v2Info;
     }
 
@@ -226,6 +267,65 @@ public class V2Impl implements IV2,Runnable {
 
         return new Position(longitude2, latitude2);
     }
+
+
+
+    //GET URLS OF ALL NAMESERVICES; WILL ONLY BE ONE BUT FOR FUTURE !!
+    public ArrayList<String> getNameServerUrl(){
+
+        if(nameListener.isServiceFound()){
+           return nameListener.getServiceURLs();
+        }
+        return new ArrayList<>();
+    }
+
+    //GET URLS OF ALL NAMESERVICES; WILL ONLY BE ONE BUT FOR FUTURE !!
+    public ArrayList<String> getWebserverUrl(){
+
+        if(webListener.isServiceFound()){
+            return webListener.getServiceURLs();
+        }
+        return new ArrayList<>();
+    }
+
+    public boolean publishPositionToWebserver(String wsdl){
+        // TODO: cant implement yet
+        return true;
+    }
+
+
+
+    //GET URL TO INFOSERVIE @PARAM url of nameservice and current position
+    public String getInformationService(String wsdl,Position position) throws MalformedURLException {
+            NameServerSOAP nameServerSOAP = new NameServerSOAP(wsdl);
+            return nameServerSOAP.getInfoServer(position);
+    }
+
+    //Publish position to @Param url to Inforservice return false => get new Infoservice
+    public boolean publishPositionToInfo(String wsdl) throws MalformedURLException {
+
+        InformationSOAP informationSOAP = new InformationSOAP(wsdl);
+        return informationSOAP.receivePosition(getV2Information());
+
+    }
+
+    public ArrayList<V2Info> getNeighboursFromInfo(String wsdl) throws MalformedURLException {
+
+        InformationSOAP informationSOAP = new InformationSOAP(wsdl);
+        return informationSOAP.getNeighbours(getV2Information());
+
+    }
+
+
+
+
+    /*
+            getInformationService // Am Anfang aufgerufen, immer wenn
+
+
+
+
+     */
 
 
 
