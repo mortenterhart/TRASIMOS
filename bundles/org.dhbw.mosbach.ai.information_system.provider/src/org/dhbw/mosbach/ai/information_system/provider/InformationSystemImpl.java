@@ -1,23 +1,38 @@
 package org.dhbw.mosbach.ai.information_system.provider;
 
+import org.dhbw.mosbach.ai.base.MapChunk;
 import org.dhbw.mosbach.ai.base.Position;
+import org.dhbw.mosbach.ai.base.V2Info;
 import org.dhbw.mosbach.ai.information_system.api.IInformationSystem;
 import org.dhbw.mosbach.ai.information_system.api.IPublishPosition;
-import org.osgi.annotation.versioning.Version;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+import javax.xml.namespace.QName;
+import javax.xml.ws.Endpoint;
+import javax.xml.ws.Service;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
-@Component(name = "information-system", service = { IInformationSystem.class, IPublishPosition.class })
-public class InformationSystemImpl implements IInformationSystem, IPublishPosition {
+@WebService(endpointInterface = "org.dhbw.mosbach.ai.information_system.api.IInformationSystem")
+@Component(name = "information-system", service = {IInformationSystem.class, IPublishPosition.class}, immediate = true)
+public class InformationSystemImpl implements IPublishPosition, IInformationSystem {
+    private HashMap<Long, V2Info> vehiclesToObserve;
+    private MapChunk areaBoundaries;
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
         System.out.println("Information system booting ...");
+        System.out.println("Try to register at name server ...");
+        vehiclesToObserve = new HashMap<>();
     }
 
     @Deactivate
@@ -25,29 +40,168 @@ public class InformationSystemImpl implements IInformationSystem, IPublishPositi
         System.out.println("Information system shutting down ...");
     }
 
-    @Override
-    public void receivePosition(long v2Id, Position position) {
-
-    }
 
     @Override
-    public void getNeighbours(long v2Id, double speed) {
+    @WebMethod
+    public boolean receivePosition(V2Info v2Info) {
 
+        System.out.println("SERVER: I RECEIVED A RECEIVE POSITION REQUEST");
+        System.out.println("SERVER: CAR ID " + v2Info.V2id);
+        System.out.println("SERVER: Position " + v2Info.position.latitude + "|" + v2Info.position.longitude);
+        // Add/Update vehicle in Map
+        // if vehicle id already exists the position of vehicle will be overridden
+        if (isVehicleInBoundary(v2Info.position)) {
+            vehiclesToObserve.put(v2Info.V2id, v2Info);
+            return true;
+        }
+        return false;
     }
 
+    /**
+     * get neighbours of vehicle by its id and speed.
+     * requres that vehicle is observed by this information system
+     *
+     * @param v2Info  info of v2 vehicle
+     * @return list of positions of neighbours
+     */
     @Override
-    public void overtakeInformationService(Position position00, Position position10, Position position01,
-                                           Position position11) {
+    @WebMethod
+    public ArrayList<V2Info> getNeighbours(V2Info v2Info) {
+        // If vehicle is new, neighbours can not be resolved
+        // Vehicle needs to publish its position first
+        if (isVehicleKnown(v2Info.V2id)) {
+            ArrayList<V2Info> positionOfNeighbours = new ArrayList<>();
+            // Check if vehicle is too close at boundary. If confirmed getNeighbours from other information systems
 
+            if (isVehicleNearBoundary(v2Info.position, v2Info.speed)) {
+                // Vehicle to close at boundary
+                // TODO: Ask other servers
+            }
+            // Add neighbours in boundary
+            for (V2Info info : vehiclesToObserve.values()) {
+                if (distanceBetweenPositions(v2Info.position, info.position) <= calcStoppingDistance(v2Info.speed)) {
+                    positionOfNeighbours.add(info);
+                }
+            }
+            return positionOfNeighbours;
+        }
+        return null;
     }
 
+    /**
+     * get neighbours of position in a specific radius
+     *
+     * @param position centre position
+     * @param radius   radius around position
+     * @return list of positions of neighbours
+     */
     @Override
-    public void receiveFinished(long v2Id) {
+    @WebMethod
+    public ArrayList<V2Info> getNeighbours(Position position, double radius) {
+        ArrayList<V2Info> positionOfNeighbours = new ArrayList<>();
 
+        for (V2Info info : vehiclesToObserve.values()) {
+            if (distanceBetweenPositions(position, info.position) <= radius) {
+                positionOfNeighbours.add(info);
+            }
+        }
+
+        return positionOfNeighbours;
     }
 
+    /**
+     * remove vehicle from observing
+     *
+     * @param v2Info id of v2 vehicle
+     */
+    @Override
+    @WebMethod
+    public void receiveFinished(V2Info v2Info) {
+        vehiclesToObserve.remove(v2Info.V2id);
+    }
+
+
+    @WebMethod
     @Override
     public void publish(Position position) {
 
     }
+
+    private double distanceBetweenPositions(Position a, Position b) {
+        return Math.sqrt(
+                (b.latitude - a.latitude) * (b.latitude - a.latitude) +
+                        (b.longitude - a.longitude) * (b.longitude - a.longitude));
+    }
+
+    private boolean isVehicleKnown(long vehicleId) {
+        return vehiclesToObserve.containsKey(vehicleId);
+    }
+
+    private boolean isVehicleInBoundary(Position position) {
+        return position.longitude > areaBoundaries.getBottomLeft().longitude &&
+                position.longitude < areaBoundaries.getBottomRight().longitude &&
+                position.latitude < areaBoundaries.getTopLeft().latitude &&
+                position.latitude > areaBoundaries.getBottomLeft().latitude;
+    }
+
+    private boolean isVehicleNearBoundary(Position position, double speed) {
+        double stoppingDistance = calcStoppingDistance(speed);
+        return position.latitude > (areaBoundaries.getBottomLeft().longitude + stoppingDistance) &&
+                position.latitude < (areaBoundaries.getBottomRight().longitude - stoppingDistance) &&
+                position.latitude < (areaBoundaries.getTopLeft().longitude - stoppingDistance) &&
+                position.latitude > (areaBoundaries.getBottomLeft().longitude + stoppingDistance);
+    }
+
+    private double calcStoppingDistance(double speed) {
+        return (speed / 10 * 3) + (speed / 10 * speed / 10);
+    }
+
+    public MapChunk getAreaBoundaries() {
+        return areaBoundaries;
+    }
+
+    public void setAreaBoundaries(MapChunk areaBoundaries) {
+        this.areaBoundaries = areaBoundaries;
+    }
+
+
+
+    /*
+        Fabi test zum starten von Zervice
+    */
+
+    public static void main(String args[]) {
+
+        //START SERVICES
+        IInformationSystem impl = new InformationSystemImpl();
+        Object implementor = impl;
+        String address = "http://localhost:9001/extremeCoolSoapApi";
+        Endpoint.publish(address, implementor);
+
+        //WAIT FOR BETTER WETTER
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        //CREATE KLIENTÉL
+        URL wsdlUrl = null;
+        try {
+            wsdlUrl = new URL(address);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        QName qname = new QName("http://provider.information_system.ai.mosbach.dhbw.org/", "InformationSystemImplService");
+        Service service = Service.create(wsdlUrl, qname);
+        IInformationSystem iInformationSystem = service.getPort(IInformationSystem.class);
+
+
+        //Make some cool Queries
+        while (true) {
+
+        }
+    }
+
 }

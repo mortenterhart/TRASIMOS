@@ -10,7 +10,7 @@ import org.osgi.service.component.annotations.Deactivate;
 
 import java.util.Map;
 
-@Component(name = "webserver", service = IWebserver.class)
+@Component(name = "webserver", service = IWebserver.class, immediate = true)
 public class WebserverImpl implements IWebserver {
 
     @Activate

@@ -3,7 +3,17 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Information System API
 Bundle-SymbolicName: org.dhbw.mosbach.ai.information_system.api
 Bundle-Version: 1.0.0
-Export-Package: org.dhbw.mosbach.ai.information_system.api;version="1.0.0"
+Export-Package: org.apache.cxf.endpoint.dynamic,
+ org.apache.cxf.jaxb,
+ org.apache.cxf.jaxb.attachment,
+ org.apache.cxf.jaxb.io,
+ org.dhbw.mosbach.ai.information_system.api;version="1.0.0"
 Automatic-Module-Name: org.dhbw.mosbach.ai.information_system.api
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Import-Package: org.dhbw.mosbach.ai.base;version="1.0.0"
+Import-Package: org.dhbw.mosbach.ai.base;version="1.0.0",
+ org.dhbw.mosbach.ai.base.Radio
+Bundle-ClassPath: lib/cxf-rt-databinding-jaxb-3.3.2.jar,
+ lib/javax.jws-api-1.1.jar,
+ lib/jaxws-api-2.3.1.jar,
+ lib/org.osgi.annotation-6.0.0.jar,
+ lib/rt-2.3.2.jar
