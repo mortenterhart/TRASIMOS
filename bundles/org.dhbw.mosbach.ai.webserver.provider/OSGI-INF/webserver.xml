@@ -3,5 +3,6 @@
    <service>
       <provide interface="org.dhbw.mosbach.ai.webserver.api.IWebserver"/>
    </service>
+   <reference bind="bindHttpService" interface="org.osgi.service.http.HttpService" name="HttpService" unbind="unbindHttpService"/>
    <implementation class="org.dhbw.mosbach.ai.webserver.provider.WebserverImpl"/>
 </scr:component>
