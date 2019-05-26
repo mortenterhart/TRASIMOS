@@ -44,7 +44,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         vehiclesToObserve = new HashMap<>();
         startListener();
         try {
-            serviceURL = "http://"+ Inet4Address.getLocalHost().getHostAddress()+ ":12002/extremeCoolSoapApi";
+            serviceURL = "http://"+ Inet4Address.getLocalHost().getHostAddress()+ ":12002/informationServiceSOAP";
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -52,7 +52,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
 
     public void startListener(){
-        //2. Listen to Nameserver
+        //Listen to Nameserver
         nameListener = new BroadcastConsumer(Configuration.NameService_multiCastAddress,Configuration.NameService_multiCastPort);
         Thread nameListenerThread = new Thread(nameListener);
         nameListenerThread.start();
@@ -60,8 +60,6 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
     @PostConstruct
     public void postConstruct(){
-
-
         while (nameListener.isServiceFound()==false){
             try {
                 Thread.sleep(100);
@@ -74,7 +72,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
             NameServerSOAP nameServerSOAP = new NameServerSOAP(nameserviceURL);
             String bounds =  nameServerSOAP.registerInfoServer(serviceURL);
 
-            //TODO MARCO POLO Bounds speichern :D
+            convertBoundaries(bounds);
 
             IInformationSystem impl = new InformationSystemImpl();
             Object implementor = impl;
@@ -200,10 +198,10 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
     private boolean isVehicleNearBoundary(Position position, double speed) {
         double stoppingDistance = calcStoppingDistance(speed);
-        return position.latitude > (areaBoundaries.getBottomLeft().longitude + stoppingDistance) &&
-                position.latitude < (areaBoundaries.getBottomRight().longitude - stoppingDistance) &&
-                position.latitude < (areaBoundaries.getTopLeft().longitude - stoppingDistance) &&
-                position.latitude > (areaBoundaries.getBottomLeft().longitude + stoppingDistance);
+        return position.latitude > (areaBoundaries.getTopLeft().latitude - stoppingDistance) ||
+                position.latitude < (areaBoundaries.getBottomLeft().latitude + stoppingDistance) ||
+                position.longitude < (areaBoundaries.getTopLeft().longitude + stoppingDistance) ||
+                position.longitude > (areaBoundaries.getTopRight().longitude - stoppingDistance);
     }
 
     private double calcStoppingDistance(double speed) {
@@ -218,12 +216,42 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         this.areaBoundaries = areaBoundaries;
     }
 
+    public void convertBoundaries(String bounds){
+        String[] positions = new String[4];
+        int actualPositionInArray = 0;
+        int lastSeparatorPosition = -1;
+        for(int i = 0; i < bounds.length(); i++){
+            if(bounds.charAt(i) == ':'){
+                positions[actualPositionInArray] = bounds.substring(lastSeparatorPosition + 1, i - 1);
+                actualPositionInArray++;
+                lastSeparatorPosition = i;
+            }
+        }
+        positions[actualPositionInArray] = bounds.substring(lastSeparatorPosition + 1, bounds.length() - 1);
+
+        Position[] boundaryPositions = new Position[4];
+        for(int i = 0; i < 4; i++){
+            for(int j = 0; j < positions[i].length(); j++){
+                if(positions[i].charAt(j) == ','){
+                    String longitude = positions[i].substring(0, j - 1);
+                    String latitude = positions[i].substring(j + 1, positions[i].length() - 1);
+                    boundaryPositions[i] = new Position(Double.parseDouble(longitude), Double.parseDouble(latitude));
+                }
+            }
+        }
+
+        MapChunk mapChunk = new MapChunk();
+        mapChunk.setTopLeft(boundaryPositions[0]);
+        mapChunk.setTopRight(boundaryPositions[1]);
+        mapChunk.setBottomLeft(boundaryPositions[2]);
+        mapChunk.setBottomRight(boundaryPositions[3]);
+        setAreaBoundaries(mapChunk);
+    }
 
 
     /*
         Fabi test zum starten von Zervice
     */
-
     public static void main(String args[]) {
 
         //START SERVICES
