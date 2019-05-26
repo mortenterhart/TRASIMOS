@@ -19,6 +19,7 @@ public class V2Info {
     @XmlTransient
     public Position position;
 
-
+    @XmlTransient
+    public Position direction;
 
 }
