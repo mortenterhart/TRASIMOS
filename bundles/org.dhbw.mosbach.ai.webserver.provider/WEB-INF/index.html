@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html style="height:100%;margin:0;padding:0;" lang="en">
+<head>
+	<title>Leaflet page with OSM render server selection</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.3/dist/leaflet.js"></script>
+	<script src="https://unpkg.com/leaflet-hash@0.2.1/leaflet-hash.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<style type="text/css">
+		.leaflet-tile-container { pointer-events: auto; }
+	</style>
+</head>
+<body style="height:100%;margin:0;padding:0;">
+	<div id="map" style="height:100%"></div>
+	<script>
+        function fetchCars() {
+            axios.get('http://localhost:8080/webserver/getV2Positions')
+                .then(function (response) {
+                    console.log(response);
+                    var markers = [];
+                    for (let i = 0; i < response.data.cars.length; i++) {
+                        markers.push(L.circleMarker([response.data.cars[i].lat, response.data.cars[i].long]));
+                    }
+                    map.removeLayer(layer);
+                    layer = L.layerGroup(markers).addTo(map);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+
+		var map = L.map('map').setView([49.35388 , 9.15070], 14);
+
+		L.tileLayer('http://141.72.191.30/hot/{z}/{x}/{y}.png', {
+		    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+		}).addTo(map);
+		var hash = L.hash(map);
+
+		var layer = L.layerGroup([]).addTo(map);
+		fetchCars();
+		setInterval(function() {
+			fetchCars()
+		}, 5000);
+	</script>
+</body>
+</html>

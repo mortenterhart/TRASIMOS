@@ -1,8 +1,8 @@
 package org.dhbw.mosbach.ai.webserver.api;
 
-import org.dhbw.mosbach.ai.base.Position;
+import org.dhbw.mosbach.ai.base.V2Info;
 
 public interface IWebserver {
 
-    public void receivePosition(long ID, Position position);
+    public void receivePosition(V2Info v2Info);
 }

@@ -1,8 +1,27 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Base Modules
-Bundle-SymbolicName: org.dhbw.mosbach.ai.base
+Bundle-SymbolicName: org.dhbw.mosbach.ai.base;singleton:=true
 Bundle-Version: 1.0.0
 Automatic-Module-Name: org.dhbw.mosbach.ai.base
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Export-Package: org.dhbw.mosbach.ai.base;version="1.0.0"
+Export-Package: com.google.gson;
+  uses:="com.google.gson.internal,
+   new com.google.gson,
+   com.google.gson.stream,
+   com.google.gson.reflect",
+ com.google.gson.annotations,
+ com.google.gson.internal;x-internal:=true,
+ com.google.gson.internal.bind;x-internal:=true,
+ com.google.gson.internal.bind.util;x-internal:=true,
+ com.google.gson.internal.reflect;x-internal:=true,
+ com.google.gson.reflect,
+ com.google.gson.stream;uses:="com.google.gson.internal",
+ org.dhbw.mosbach.ai.base;version="1.0.0",
+ org.dhbw.mosbach.ai.base.Radio;version="1.0.0"
+Bundle-ClassPath: lib/gson-2.8.5.jar,
+ lib/guava-27.1-jre.jar,
+ lib/jaxb-api-2.3.1.jar,
+ lib/org.osgi.annotation-6.0.0.jar
+Require-Bundle: org.eclipse.osgi;bundle-version="3.13.300",
+ org.eclipse.osgi.services;bundle-version="3.8.0"

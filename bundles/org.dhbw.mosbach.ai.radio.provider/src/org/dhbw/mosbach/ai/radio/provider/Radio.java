@@ -15,13 +15,16 @@ import java.util.ArrayList;
 import java.util.Map;
 
 
-@Component(name = "radio",service = IRadio.class)
+@Component(name = "radio",service = IRadio.class, immediate = true)
 public class Radio implements Runnable, IRegisterListener,IRadio  {
 
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
         System.out.println("V2 booting ...");
+        
+        threadRadio = new Thread(this);
+        threadRadio.start();
 
     }
 
@@ -46,8 +49,7 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
     public static volatile ArrayList<String> webServer = new ArrayList<>();
 
     public Radio(){
-            threadRadio = new Thread(this);
-            threadRadio.start();
+            
     }
 
 
