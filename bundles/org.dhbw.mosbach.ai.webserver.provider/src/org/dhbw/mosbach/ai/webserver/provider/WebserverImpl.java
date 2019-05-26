@@ -127,7 +127,7 @@ public class WebserverImpl implements IWebserver {
         Thread radioListenerThread = new Thread(radioListener);
         radioListenerThread.start();
 
-        while (radioListener.isServiceFound() == false) {
+        while (!radioListener.isServiceFound()) {
         }
 
         if (radioListener.getServiceURLs().size() > 0) {
