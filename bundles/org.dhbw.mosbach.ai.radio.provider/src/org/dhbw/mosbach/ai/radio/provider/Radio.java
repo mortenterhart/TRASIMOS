@@ -21,7 +21,7 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
-        System.out.println("V2 booting ...");
+        System.out.println("Radio booting ...");
         
         threadRadio = new Thread(this);
         threadRadio.start();
@@ -30,7 +30,7 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
 
     @Deactivate
     public void deactivate() {
-        System.out.println("V2 shutting down ...");
+        System.out.println("Radio shutting down ...");
     }
 
     BroadcastPublisher radioPublish;
@@ -81,7 +81,7 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
 
             } catch (Exception exp) {
 
-                System.out.println("Failed to start SOAP register Service "+exp);
+                //System.out.println("Failed to start SOAP register Service "+exp);
             }
 
         }
