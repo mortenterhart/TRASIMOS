@@ -36,17 +36,21 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     private BroadcastConsumer nameListener;
     private String nameserviceURL;
     private String serviceURL;
+    private boolean actvationDone=false;
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
-        System.out.println("Information system booting ...");
-        System.out.println("Try to register at name server ...");
-        vehiclesToObserve = new HashMap<>();
-        startListener();
-        try {
-            serviceURL = "http://"+ Inet4Address.getLocalHost().getHostAddress()+ ":12002/informationServiceSOAP";
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
+
+        if (actvationDone==false) {
+            System.out.println("Information system booting ...");
+            System.out.println("Try to register at name server ...");
+            vehiclesToObserve = new HashMap<>();
+            startListener();
+            try {
+                serviceURL = "http://" + Inet4Address.getLocalHost().getHostAddress() + ":12002/informationServiceSOAP";
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -60,6 +64,10 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
     @PostConstruct
     public void postConstruct(){
+
+        if (actvationDone==false){
+            activate(null,null,null);
+        }
         while (nameListener.isServiceFound()==false){
             try {
                 Thread.sleep(100);

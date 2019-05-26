@@ -46,8 +46,7 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
     public static volatile ArrayList<String> webServer = new ArrayList<>();
 
     public Radio(){
-            threadRadio = new Thread(this);
-            threadRadio.start();
+
     }
 
 
