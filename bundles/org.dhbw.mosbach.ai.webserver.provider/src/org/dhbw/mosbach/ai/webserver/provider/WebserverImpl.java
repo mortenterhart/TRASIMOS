@@ -2,6 +2,9 @@ package org.dhbw.mosbach.ai.webserver.provider;
 
 import org.dhbw.mosbach.ai.base.Position;
 import org.dhbw.mosbach.ai.base.V2Info;
+import org.dhbw.mosbach.ai.base.Radio.BroadcastConsumer;
+import org.dhbw.mosbach.ai.base.Radio.Configuration;
+import org.dhbw.mosbach.ai.radio.api.RadioSOAP;
 import org.dhbw.mosbach.ai.v2.factory.IV2Factory;
 import org.dhbw.mosbach.ai.webserver.api.IWebserver;
 import org.osgi.framework.BundleContext;
@@ -27,6 +30,8 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
+
+import java.net.Inet4Address;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -48,6 +53,8 @@ public class WebserverImpl implements IWebserver {
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
         System.out.println("Webserver booting ...");
 
+        registerServiceAtRadio();
+
         startService();
         startServlet();
     }
@@ -56,12 +63,12 @@ public class WebserverImpl implements IWebserver {
     public void deactivate() {
         System.out.println("Webserver shutting down ...");
     }
-    
+
     @Reference(unbind = "unbindHttpService")
     public void bindHttpService(HttpService httpService) {
         this.httpService = httpService;
     }
-    
+
     public void unbindHttpService(HttpService httpService) {
         this.httpService = null;
     }
@@ -69,7 +76,8 @@ public class WebserverImpl implements IWebserver {
     @Override
     @WebMethod
     public void receivePosition(V2Info v2Info) {
-        System.out.printf("Received position (%f, %f) from V2 %d%n", v2Info.position.latitude, v2Info.position.longitude, v2Info.V2id);
+        System.out.printf("Received position (%f, %f) from V2 %d%n", v2Info.position.latitude,
+                v2Info.position.longitude, v2Info.V2id);
         v2Positions.put(v2Info.V2id, v2Info.position);
     }
 
@@ -97,13 +105,13 @@ public class WebserverImpl implements IWebserver {
 
     private void startService() {
         try {
-            String webserverAddress = "http://localhost:9005/webserverService";
+            String webserverAddress = "http://0.0.0.0:9005/webserverService";
             Endpoint.publish(webserverAddress, this);
         } catch (WebServiceException exc) {
             exc.printStackTrace();
         }
     }
-    
+
     private void startServlet() {
         try {
             httpService.registerServlet("/v2map", new MapServlet(), null, null);
@@ -111,6 +119,35 @@ public class WebserverImpl implements IWebserver {
             e.printStackTrace();
         } catch (NamespaceException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void registerServiceAtRadio() {
+        BroadcastConsumer radioListener = new BroadcastConsumer(Configuration.Radio_multiCastAddress, Configuration.Radio_multiCastPort);
+        Thread radioListenerThread = new Thread(radioListener);
+        radioListenerThread.start();
+
+        while (radioListener.isServiceFound() == false) {
+        }
+
+        if (radioListener.getServiceURLs().size() > 0) {
+            String radioRegiURl = radioListener.getServiceURLs().get(0);
+            RadioSOAP radioSOAP = null;
+            try {
+                radioSOAP = new RadioSOAP(radioRegiURl);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                String localIp = Inet4Address.getLocalHost().getHostAddress();
+                // Register webserverService
+                String webserviceURL = "http://" + localIp + ":9005/webserverService";
+
+                radioSOAP.registerServiceAccess(Configuration.Webserver_ContentType, webserviceURL);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }
