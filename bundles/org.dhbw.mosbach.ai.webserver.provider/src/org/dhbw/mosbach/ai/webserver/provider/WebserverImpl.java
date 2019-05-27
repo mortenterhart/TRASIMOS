@@ -1,9 +1,9 @@
 package org.dhbw.mosbach.ai.webserver.provider;
 
 import org.dhbw.mosbach.ai.base.Position;
-import org.dhbw.mosbach.ai.base.V2Info;
 import org.dhbw.mosbach.ai.base.Radio.BroadcastConsumer;
 import org.dhbw.mosbach.ai.base.Radio.Configuration;
+import org.dhbw.mosbach.ai.base.V2Info;
 import org.dhbw.mosbach.ai.radio.api.RadioSOAP;
 import org.dhbw.mosbach.ai.v2.factory.IV2Factory;
 import org.dhbw.mosbach.ai.webserver.api.IWebserver;
@@ -30,7 +30,6 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
-
 import java.net.Inet4Address;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -48,12 +47,13 @@ public class WebserverImpl implements IWebserver {
     private Map<Long, Position> v2Positions = Collections.synchronizedMap(new HashMap<>());
     private IV2Factory v2Factory;
     private HttpService httpService;
+    private String servletPath = "/v2map";
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
         System.out.println("Webserver booting ...");
 
-        registerServiceAtRadio();
+        //registerServiceAtRadio();
 
         startService();
         startServlet();
@@ -62,6 +62,8 @@ public class WebserverImpl implements IWebserver {
     @Deactivate
     public void deactivate() {
         System.out.println("Webserver shutting down ...");
+
+        httpService.unregister(servletPath);
     }
 
     @Reference(unbind = "unbindHttpService")
@@ -77,7 +79,7 @@ public class WebserverImpl implements IWebserver {
     @WebMethod
     public void receivePosition(V2Info v2Info) {
         System.out.printf("Received position (%f, %f) from V2 %d%n", v2Info.position.latitude,
-                v2Info.position.longitude, v2Info.V2id);
+                          v2Info.position.longitude, v2Info.V2id);
         v2Positions.put(v2Info.V2id, v2Info.position);
     }
 
@@ -114,7 +116,9 @@ public class WebserverImpl implements IWebserver {
 
     private void startServlet() {
         try {
-            httpService.registerServlet("/v2map", new MapServlet(), null, null);
+            httpService.registerServlet(servletPath, new MapServlet(), null, null);
+            servletPath = "/map";
+            httpService.registerResources(servletPath, "WEB-INF", null);
         } catch (ServletException e) {
             e.printStackTrace();
         } catch (NamespaceException e) {

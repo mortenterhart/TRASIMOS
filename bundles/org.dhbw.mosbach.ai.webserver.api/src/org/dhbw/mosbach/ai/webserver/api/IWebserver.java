@@ -1,10 +1,10 @@
 package org.dhbw.mosbach.ai.webserver.api;
 
+import org.dhbw.mosbach.ai.base.V2Info;
+
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
-
-import org.dhbw.mosbach.ai.base.V2Info;
 
 @WebService
 @SOAPBinding(style = SOAPBinding.Style.RPC)

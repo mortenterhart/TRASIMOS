@@ -14,14 +14,12 @@ import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.Map;
 
-
-@Component(name = "radio",service = IRadio.class, immediate = true)
-public class Radio implements Runnable, IRegisterListener,IRadio  {
+@Component(name = "radio", service = IRadio.class, immediate = true)
+public class Radio implements Runnable, IRegisterListener, IRadio {
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
         System.out.println("Radio booting ...");
-
     }
 
     @Deactivate
@@ -40,14 +38,12 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
 
     RegisterService registerService;
 
-
     public static volatile ArrayList<String> nameServices = new ArrayList<>();
     public static volatile ArrayList<String> webServer = new ArrayList<>();
 
-    public Radio(){
+    public Radio() {
 
     }
-
 
     @Override
     public void run() {
@@ -59,12 +55,11 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
 
         boolean initalized = false;
 
-        while (initalized==false) {
+        while (initalized == false) {
 
             try {
 
-
-                String url = Configuration.general_https+"0.0.0.0"+Configuration.Radio_Registration_url;
+                String url = Configuration.general_https + "0.0.0.0" + Configuration.Radio_Registration_url;
                 registerService = new RegisterService();
                 registerService.addIRegisterListener(this);
                 Object implementor = registerService;
@@ -73,45 +68,41 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
                 //Create SOAP Webservice for Registration of Service
                 //RegisterService.startService(this,Configuration.general_https+"0.0.0.0"+Configuration.Radio_Registration_url);
 
-                initalized=true;
-
+                initalized = true;
             } catch (Exception exp) {
+                //exp.printStackTrace();
 
-                System.out.println("Failed to start SOAP register Service "+exp);
+                System.out.println("Failed to start SOAP register Service " + exp);
             }
-
         }
 
         initalized = false;
 
-        while (initalized==false) {
+        while (initalized == false) {
 
             try {
 
                 //Start radioThread and publish local IP
                 String localIp = Inet4Address.getLocalHost().getHostAddress();
                 ServiceInformation serviceInformation = new ServiceInformation();
-                serviceInformation.serviceTyp= Configuration.Radio_ContentType;
-                serviceInformation.urls.add(Configuration.general_https+localIp+Configuration.Radio_Registration_url);
-                radioPublish = new BroadcastPublisher(Configuration.Radio_multiCastAddress, Configuration.Radio_multiCastPort,serviceInformation,Configuration.Radio_ContentType,Configuration.Radio_Delay_Broadcast);
+                serviceInformation.serviceTyp = Configuration.Radio_ContentType;
+                serviceInformation.urls.add(Configuration.general_https + localIp + Configuration.Radio_Registration_url);
+                radioPublish = new BroadcastPublisher(Configuration.Radio_multiCastAddress, Configuration.Radio_multiCastPort, serviceInformation, Configuration.Radio_ContentType, Configuration.Radio_Delay_Broadcast);
                 radioThread = new Thread(radioPublish);
                 radioThread.start();
 
-                initalized=true;
-
+                initalized = true;
             } catch (Exception exp) {
 
-                System.out.println("Failed to start Nameservice UDP "+exp);
+                System.out.println("Failed to start Nameservice UDP " + exp);
             }
-
         }
 
         initalized = false;
 
-        while (initalized==false) {
+        while (initalized == false) {
 
             try {
-
 
                 ServiceInformation serviceInformationName = new ServiceInformation();
                 serviceInformationName.serviceTyp = Configuration.NameService_ContentType;
@@ -120,19 +111,16 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
                 nameThread = new Thread(namePublish);
                 nameThread.start();
 
-
                 initalized = true;
-
             } catch (Exception exp) {
 
                 System.out.println("Failed to start Webserver UDP " + exp);
             }
-
         }
 
         initalized = false;
 
-        while (initalized==false) {
+        while (initalized == false) {
 
             try {
 
@@ -145,12 +133,10 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
 
                 initalized = true;
                 System.out.println("__________Started Broadcast Channels succesfull___________");
-
             } catch (Exception exp) {
 
                 System.out.println("Failed to start Radio " + exp);
             }
-
         }
 
         while (true) {
@@ -162,15 +148,14 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
                 e.printStackTrace();
             }
         }
-
     }
 
     //GetTCP Messages via Oberserver Pattern
     @Override
-    public void getNotified(String url,String serviceTyp){
-        switch (serviceTyp){
+    public void getNotified(String url, String serviceTyp) {
+        switch (serviceTyp) {
             //Adds and sets new url to publisher as Message for UDP Port
-            case Configuration.NameService_ContentType :
+            case Configuration.NameService_ContentType:
                 nameServices.add(url);
                 setNameServiceMessage();
                 break;
@@ -189,7 +174,7 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
         this.webserverPublish.setMessage(serviceInformation);
     }
 
-    public void setNameServiceMessage(){
+    public void setNameServiceMessage() {
         ServiceInformation serviceInformation = new ServiceInformation();
         serviceInformation.serviceTyp = Configuration.NameService_ContentType;
         serviceInformation.urls.addAll(nameServices);

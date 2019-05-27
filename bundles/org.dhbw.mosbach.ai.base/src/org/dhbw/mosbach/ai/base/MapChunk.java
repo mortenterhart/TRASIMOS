@@ -63,11 +63,9 @@ public class MapChunk {
     }
 
     public boolean isWithin(Position p) {
-        return p.getLatitude()  >= this.bottomLeft.getLatitude()  &&
-                p.getLatitude()  <= this.topRight.getLatitude()    &&
-                p.getLongitude() >= this.bottomLeft.getLongitude() &&
-                p.getLongitude() <= this.topRight.getLongitude();
-
+        return p.getLatitude() >= this.bottomLeft.getLatitude() &&
+               p.getLatitude() <= this.topRight.getLatitude() &&
+               p.getLongitude() >= this.bottomLeft.getLongitude() &&
+               p.getLongitude() <= this.topRight.getLongitude();
     }
-
 }

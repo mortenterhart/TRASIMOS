@@ -7,9 +7,8 @@ public class ServiceInformation {
     public String serviceTyp;
     public ArrayList<String> urls;
 
-    public ServiceInformation(){
+    public ServiceInformation() {
         serviceTyp = "";
         urls = new ArrayList<>();
     }
-
 }
