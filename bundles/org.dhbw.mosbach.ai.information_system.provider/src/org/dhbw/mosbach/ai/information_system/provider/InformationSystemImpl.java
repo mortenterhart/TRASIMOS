@@ -37,6 +37,15 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     private String nameserviceURL;
     private String serviceURL;
 
+
+    public InformationSystemImpl(){
+        super();
+    }
+
+    public InformationSystemImpl(MapChunk mapChunk){
+        this.areaBoundaries = mapChunk;
+    }
+
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
         System.out.println("Information system booting ...");
@@ -72,9 +81,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
             NameServerSOAP nameServerSOAP = new NameServerSOAP(nameserviceURL);
             String bounds =  nameServerSOAP.registerInfoServer(serviceURL);
 
-            setAreaBoundaries(new MapChunk(bounds));
-
-            IInformationSystem impl = new InformationSystemImpl();
+            IInformationSystem impl = new InformationSystemImpl(new MapChunk(bounds));
             Object implementor = impl;
             String address = "http://0.0.0.0:12002/InformationServer";
             Endpoint.publish(address, implementor);
