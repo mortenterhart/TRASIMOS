@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.name_server.api.INameServer")
-@Component(name = "name-server", service = INameServer.class)
+@Component(name = "name-server", service = INameServer.class, immediate = true)
 public class NameServerImpl implements INameServer {
 	
 	Map<String, MapChunk> infoServers = Collections.synchronizedMap(new HashMap<>());

@@ -21,7 +21,7 @@ import java.util.*;
 
 
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.v2.api.IV2")
-@Component(name = "v2", service = IV2.class)
+@Component(name = "v2", service = IV2.class, immediate = true)
 public class V2Impl implements IV2,Runnable {
 
     private long id;
@@ -35,6 +35,10 @@ public class V2Impl implements IV2,Runnable {
     private String SOAPURL;
 
     private int TIMEOUT = 1;
+
+    public V2Impl(){
+
+    }
 
     public V2Impl(long id,double originLongitude, double originLatitude, double destinationLongitude, double destinationLatitude) throws UnknownHostException {
         this.id=id;
