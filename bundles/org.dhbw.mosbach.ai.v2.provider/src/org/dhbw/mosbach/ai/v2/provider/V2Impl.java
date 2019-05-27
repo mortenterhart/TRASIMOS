@@ -31,7 +31,7 @@ import java.util.*;
 //import org.dhbw.mosbach.ai.base.Position;
 
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.v2.api.IV2")
-@Component(name = "v2", service = IV2.class)
+@Component(name = "v2", service = IV2.class, immediate = true)
 public class V2Impl implements IV2, Runnable {
 
     static class Route{

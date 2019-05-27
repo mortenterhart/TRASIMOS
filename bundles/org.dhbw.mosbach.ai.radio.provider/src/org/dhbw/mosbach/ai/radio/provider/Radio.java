@@ -15,19 +15,18 @@ import java.util.ArrayList;
 import java.util.Map;
 
 
-@Component(name = "radio",service = IRadio.class)
+@Component(name = "radio",service = IRadio.class, immediate = true)
 public class Radio implements Runnable, IRegisterListener,IRadio  {
-
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
-        System.out.println("V2 booting ...");
+        System.out.println("Radio booting ...");
 
     }
 
     @Deactivate
     public void deactivate() {
-        System.out.println("V2 shutting down ...");
+        System.out.println("Radio shutting down ...");
     }
 
     BroadcastPublisher radioPublish;
@@ -199,6 +198,6 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
 
     @Override
     public void registerServiceAccess(String url, String serviceTyp) {
-        registerService.registerServiceAccess(url,serviceTyp);
+        registerService.registerServiceAccess(url, serviceTyp);
     }
 }

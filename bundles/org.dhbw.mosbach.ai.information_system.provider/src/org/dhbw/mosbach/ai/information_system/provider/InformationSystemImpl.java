@@ -14,7 +14,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 
-import javax.annotation.PostConstruct;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
@@ -29,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.information_system.api.IInformationSystem")
-@Component(name = "information-system", service = {IInformationSystem.class, IPublishPosition.class})
+@Component(name = "information-system", service = {IInformationSystem.class, IPublishPosition.class}, immediate = true)
 public class InformationSystemImpl implements IPublishPosition, IInformationSystem {
 
     public volatile static int id = 0;
@@ -38,7 +37,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     private BroadcastConsumer nameListener;
     private String nameserviceURL;
     private String serviceURL;
-    private boolean actvationDone=false;
+    private boolean activationDone=false;
 
 
     private synchronized int getCurrID(){
@@ -58,7 +57,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        actvationDone=true;
+        activationDone=true;
 
         while (nameListener.isServiceFound()==false){
             try {
@@ -72,7 +71,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
             NameServerSOAP nameServerSOAP = new NameServerSOAP(nameserviceURL);
             String bounds =  nameServerSOAP.registerInfoServer(serviceURL);
 
-            convertBoundaries(bounds);
+            setAreaBoundaries(new MapChunk(bounds));
 
             IInformationSystem impl = this;
             Object implementor = impl;
@@ -148,6 +147,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
                 if (isVehicleNearBoundary(v2Info.position, v2Info.speed)) {
                     // Vehicle to close at boundary
                     // TODO: Ask other servers
+
                 }
                 // Add neighbours in boundary
                 for (V2Info info : vehiclesToObserve.values()) {
@@ -240,38 +240,6 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
     public void setAreaBoundaries(MapChunk areaBoundaries) {
         this.areaBoundaries = areaBoundaries;
-    }
-
-    public void convertBoundaries(String bounds){
-        String[] positions = new String[4];
-        int actualPositionInArray = 0;
-        int lastSeparatorPosition = -1;
-        for(int i = 0; i < bounds.length(); i++){
-            if(bounds.charAt(i) == ':'){
-                positions[actualPositionInArray] = bounds.substring(lastSeparatorPosition + 1, i - 1);
-                actualPositionInArray++;
-                lastSeparatorPosition = i;
-            }
-        }
-        positions[actualPositionInArray] = bounds.substring(lastSeparatorPosition + 1, bounds.length() - 1);
-
-        Position[] boundaryPositions = new Position[4];
-        for(int i = 0; i < 4; i++){
-            for(int j = 0; j < positions[i].length(); j++){
-                if(positions[i].charAt(j) == ','){
-                    String longitude = positions[i].substring(0, j - 1);
-                    String latitude = positions[i].substring(j + 1, positions[i].length() - 1);
-                    boundaryPositions[i] = new Position(Double.parseDouble(longitude), Double.parseDouble(latitude));
-                }
-            }
-        }
-
-        MapChunk mapChunk = new MapChunk();
-        mapChunk.setTopLeft(boundaryPositions[0]);
-        mapChunk.setTopRight(boundaryPositions[1]);
-        mapChunk.setBottomLeft(boundaryPositions[2]);
-        mapChunk.setBottomRight(boundaryPositions[3]);
-        setAreaBoundaries(mapChunk);
     }
 
 
