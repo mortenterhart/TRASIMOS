@@ -15,7 +15,7 @@ public class NameServerSOAP implements INameServer{
     public NameServerSOAP(String nameserverURL) throws MalformedURLException {
 
         //CREATE KLIENTÉL
-        URL wsdlUrl =  new URL(nameserverURL);
+        URL wsdlUrl =  new URL(nameserverURL+"?wsdl");
         QName qname = new QName(Configuration.NameService_IMPL_NameSpace,Configuration.NameService_Local_Part);
         Service service = Service.create(wsdlUrl, qname);
         nameServer  = service.getPort(INameServer.class);

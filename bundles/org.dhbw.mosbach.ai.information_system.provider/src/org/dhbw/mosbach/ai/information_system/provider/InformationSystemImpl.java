@@ -71,7 +71,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
             NameServerSOAP nameServerSOAP = new NameServerSOAP(nameserviceURL);
             String bounds =  nameServerSOAP.registerInfoServer(serviceURL);
 
-            setAreaBoundaries(new MapChunk(bounds));
+            convertBoundaries(bounds);
 
             IInformationSystem impl = this;
             Object implementor = impl;
@@ -110,15 +110,15 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
         try{
 
-            System.out.println("SERVER: I RECEIVED A RECEIVE POSITION REQUEST");
-            System.out.println("SERVER: CAR ID " + v2Info.V2id);
-            System.out.println("SERVER: Position " + v2Info.position.latitude + "|" + v2Info.position.longitude);
-            // Add/Update vehicle in Map
-            // if vehicle id already exists the position of vehicle will be overridden
-            if (isVehicleInBoundary(v2Info.position)) {
-                vehiclesToObserve.put(v2Info.V2id, v2Info);
-                return true;
-            }
+        System.out.println("SERVER: I RECEIVED A RECEIVE POSITION REQUEST");
+        System.out.println("SERVER: CAR ID " + v2Info.V2id);
+        System.out.println("SERVER: Position " + v2Info.position.latitude + "|" + v2Info.position.longitude);
+        // Add/Update vehicle in Map
+        // if vehicle id already exists the position of vehicle will be overridden
+        if (isVehicleInBoundary(v2Info.position)) {
+            vehiclesToObserve.put(v2Info.V2id, v2Info);
+            return true;
+        }
 
         }catch (Exception exp){
             System.out.println("Failed receive Position");
@@ -147,6 +147,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
                 if (isVehicleNearBoundary(v2Info.position, v2Info.speed)) {
                     // Vehicle to close at boundary
                     // TODO: Ask other servers
+
                 }
                 // Add neighbours in boundary
                 for (V2Info info : vehiclesToObserve.values()) {
@@ -240,5 +241,6 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     public void setAreaBoundaries(MapChunk areaBoundaries) {
         this.areaBoundaries = areaBoundaries;
     }
+
 
 }

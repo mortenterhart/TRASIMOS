@@ -79,7 +79,7 @@ public class NameServerImpl implements INameServer {
 
 	@Override
 	@WebMethod
-	public String registerInfoServer(String url) {
+	public synchronized String registerInfoServer(String url) {
 		String boundaries = null;
 		switch(infoServers.size()) {
 		case 0: 
@@ -88,15 +88,19 @@ public class NameServerImpl implements INameServer {
 						wholeMap.getTopLeft().midPoint(wholeMap.getBottomLeft()) + ":" +
 						wholeMap.getTopRight().midPoint(wholeMap.getBottomRight());
 			break;
-		case 1:
+		default:
 			boundaries = wholeMap.getTopLeft().midPoint(wholeMap.getBottomLeft()) + ":" +
 						wholeMap.getTopRight().midPoint(wholeMap.getBottomRight()) + ":" +
 						wholeMap.getBottomLeft() + ":" +
 						wholeMap.getBottomRight();
 			break;
+
 		}
-				
-		infoServers.put(url, new MapChunk(boundaries));
+
+		System.out.println("Regisered Info: "+url+" bounds: "+boundaries);
+		if (infoServers.size()<2) {
+			infoServers.put(url, new MapChunk(boundaries));
+		}
 		
 		return boundaries;
 	}

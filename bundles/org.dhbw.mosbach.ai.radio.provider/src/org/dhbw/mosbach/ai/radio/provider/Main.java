@@ -9,8 +9,7 @@ import java.util.ArrayList;
 
 //EXAMPLE HOW TO USE THE RADIO
 public class Main {
-    public static void main(String args[]){
-
+    public static void main(String args[]) {
 
 
         //RADIO MUST BE STARTED [not by client]
@@ -18,6 +17,9 @@ public class Main {
         Thread radioT = new Thread(radio);
         radioT.start();
 
+    }
+
+    public void demo(){
 
         //CLIENT
 

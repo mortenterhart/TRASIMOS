@@ -17,7 +17,8 @@ public class InformationSOAP implements IInformationSystem {
     public InformationSOAP(String urlToInformationSystem) throws MalformedURLException {
 
         //CREATE KLIENTÉL
-        URL wsdlUrl =  new URL(urlToInformationSystem);
+        System.out.println(urlToInformationSystem);
+        URL wsdlUrl =  new URL(urlToInformationSystem+"?wsdl");
         QName qname = new QName(Configuration.InfoSystem_NameSpace,Configuration.InfoSystem_Local_Part);
         Service service = Service.create(wsdlUrl, qname);
         informationSystem  = service.getPort(IInformationSystem.class);
@@ -35,8 +36,8 @@ public class InformationSOAP implements IInformationSystem {
     }
 
     @Override
-    public ArrayList<V2Info> getNeighbours(Position position, double radius) {
-        return informationSystem.getNeighbours(position,radius);
+    public ArrayList<V2Info> getNeighboursRemote(Position position, double radius) {
+        return informationSystem.getNeighboursRemote(position,radius);
     }
 
     @Override
