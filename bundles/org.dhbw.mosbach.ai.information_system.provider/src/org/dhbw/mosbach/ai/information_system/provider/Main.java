@@ -4,6 +4,10 @@ public class Main {
     public static void main(String args[]){
         InformationSystemImpl informationSystem = new InformationSystemImpl();
         informationSystem.activate(null,null,null);
-        informationSystem.postConstruct();
+
+        InformationSystemImpl informationSystem2 = new InformationSystemImpl();
+        informationSystem2.activate(null,null,null);
+
+        while (true);
     }
 }

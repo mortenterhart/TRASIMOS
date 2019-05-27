@@ -20,7 +20,7 @@ public interface IInformationSystem {
     public ArrayList<V2Info> getNeighbours(V2Info v2Info);
 
     @WebMethod
-    public ArrayList<V2Info> getNeighbours(Position position, double radius);
+    public ArrayList<V2Info> getNeighboursRemote(Position position, double radius);
 
     @WebMethod
     public void receiveFinished(V2Info v2Info);

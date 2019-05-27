@@ -31,6 +31,8 @@ import java.util.Map;
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.information_system.api.IInformationSystem")
 @Component(name = "information-system", service = {IInformationSystem.class, IPublishPosition.class})
 public class InformationSystemImpl implements IPublishPosition, IInformationSystem {
+
+    public volatile static int id = 0;
     private HashMap<Long, V2Info> vehiclesToObserve;
     private MapChunk areaBoundaries;
     private BroadcastConsumer nameListener;
@@ -41,33 +43,19 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
 
-        if (actvationDone==false) {
-            System.out.println("Information system booting ...");
+             id ++;
+           System.out.println("Information system booting ...");
             System.out.println("Try to register at name server ...");
             vehiclesToObserve = new HashMap<>();
             startListener();
             try {
-                serviceURL = "http://" + Inet4Address.getLocalHost().getHostAddress() + ":12002/informationServiceSOAP";
+                serviceURL = "http://" + Inet4Address.getLocalHost().getHostAddress() + ":12002/"+id+"/InformationServer";
+
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             }
-        }
-    }
+            actvationDone=true;
 
-
-    public void startListener(){
-        //Listen to Nameserver
-        nameListener = new BroadcastConsumer(Configuration.NameService_multiCastAddress,Configuration.NameService_multiCastPort);
-        Thread nameListenerThread = new Thread(nameListener);
-        nameListenerThread.start();
-    }
-
-    @PostConstruct
-    public void postConstruct(){
-
-        if (actvationDone==false){
-            activate(null,null,null);
-        }
         while (nameListener.isServiceFound()==false){
             try {
                 Thread.sleep(100);
@@ -84,13 +72,22 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
             IInformationSystem impl = new InformationSystemImpl();
             Object implementor = impl;
-            String address = "http://0.0.0.0:12002/InformationServer";
+            String address = "http://0.0.0.0:12002/"+id+"/InformationServer";
             Endpoint.publish(address, implementor);
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
     }
+
+
+    public void startListener(){
+        //Listen to Nameserver
+        nameListener = new BroadcastConsumer(Configuration.NameService_multiCastAddress,Configuration.NameService_multiCastPort);
+        Thread nameListenerThread = new Thread(nameListener);
+        nameListenerThread.start();
+    }
+
 
 
     @Deactivate
@@ -129,7 +126,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         // Vehicle needs to publish its position first
         if (isVehicleKnown(v2Info.V2id)) {
             ArrayList<V2Info> positionOfNeighbours = new ArrayList<>();
-            // Check if vehicle is too close at boundary. If confirmed getNeighbours from other information systems
+            // Check if vehicle is too close at boundary. If confirmed getNeighboursRemote from other information systems
 
             if (isVehicleNearBoundary(v2Info.position, v2Info.speed)) {
                 // Vehicle to close at boundary
@@ -157,7 +154,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
      */
     @Override
     @WebMethod
-    public ArrayList<V2Info> getNeighbours(Position position, double radius) {
+    public ArrayList<V2Info> getNeighboursRemote(Position position, double radius) {
         ArrayList<V2Info> positionOfNeighbours = new ArrayList<>();
 
         for (V2Info info : vehiclesToObserve.values()) {

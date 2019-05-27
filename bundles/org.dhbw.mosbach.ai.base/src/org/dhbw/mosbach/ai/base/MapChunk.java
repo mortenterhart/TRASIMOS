@@ -18,13 +18,13 @@ public class MapChunk {
         for (int i = 0; i < boundariesArr.length; i++) {
             String[] posArr = boundariesArr[i].split(",");
 
-            if (i == 0) {
+            if (i == 2) {
                 this.topLeft = new Position(Double.parseDouble(posArr[0]), Double.parseDouble(posArr[1]));
-            } else if (i == 1) {
-                this.topRight = new Position(Double.parseDouble(posArr[0]), Double.parseDouble(posArr[1]));
-            } else if (i == 2) {
-                this.bottomLeft = new Position(Double.parseDouble(posArr[0]), Double.parseDouble(posArr[1]));
             } else if (i == 3) {
+                this.topRight = new Position(Double.parseDouble(posArr[0]), Double.parseDouble(posArr[1]));
+            } else if (i == 0) {
+                this.bottomLeft = new Position(Double.parseDouble(posArr[0]), Double.parseDouble(posArr[1]));
+            } else if (i == 1) {
                 this.bottomRight = new Position(Double.parseDouble(posArr[0]), Double.parseDouble(posArr[1]));
             }
         }

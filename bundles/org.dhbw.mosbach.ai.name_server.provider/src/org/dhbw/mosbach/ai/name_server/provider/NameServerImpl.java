@@ -79,7 +79,7 @@ public class NameServerImpl implements INameServer {
 
 	@Override
 	@WebMethod
-	public String registerInfoServer(String url) {
+	public synchronized String registerInfoServer(String url) {
 		String boundaries = null;
 		switch(infoServers.size()) {
 		case 0: 
