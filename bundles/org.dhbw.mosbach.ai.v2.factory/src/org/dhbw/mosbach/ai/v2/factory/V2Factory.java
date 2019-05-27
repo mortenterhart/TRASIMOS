@@ -47,7 +47,7 @@ public class V2Factory implements IV2Factory {
         for (int i = id; i < count + id; i++) {
             V2Impl v2 = null;
             try {
-                v2 = new V2Impl((long)i,generateRandomLongtitude(),generateRandomLatitude(),generateRandomLongtitude(),generateRandomLatitude());
+                v2 = new V2Impl((long)i,generateRandomLongtitude(),generateRandomLatitude(),generateRandomLongtitude(),generateRandomLatitude(),100);
 
             System.out.println("Thread with id " + i);
 

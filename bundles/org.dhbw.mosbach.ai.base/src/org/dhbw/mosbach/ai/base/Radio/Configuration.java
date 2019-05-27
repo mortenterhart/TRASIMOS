@@ -6,11 +6,11 @@ public class Configuration {
 
     public static String general_Seperation = ";";
 
-    public static double root00_mappoint_lang = 0;
-    public static double root00_mappoint_lat = 0;
+    public static double root00_mappoint_lang = 49.8000;
+    public static double root00_mappoint_lat = 9.0000;
 
-    public static double root11_mapppoint_lang = 2;
-    public static double root11_mapppoint_lat = 2;
+    public static double root11_mapppoint_lang = 49.3000;
+    public static double root11_mapppoint_lat = 9.5000;
 
 
     //Radio Multicast Group

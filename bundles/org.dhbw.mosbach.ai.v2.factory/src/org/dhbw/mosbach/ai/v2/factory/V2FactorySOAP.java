@@ -11,7 +11,7 @@ public class V2FactorySOAP implements IV2Factory{
 
     public V2FactorySOAP(String V2FactoryUrl) throws MalformedURLException {
 
-        URL wsdlUrl = new URL(V2FactoryUrl);
+        URL wsdlUrl = new URL(V2FactoryUrl+"?wsdl");
         QName qname = new QName("http://factory.v2.ai.mosbach.dhbw.org/", "FactoryServiceService");
         Service factory = Service.create(wsdlUrl, qname);
         factoryService = factory.getPort(IV2Factory.class);
