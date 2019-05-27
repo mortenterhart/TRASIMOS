@@ -94,6 +94,7 @@ public class NameServerImpl implements INameServer {
 						wholeMap.getBottomLeft() + ":" +
 						wholeMap.getBottomRight();
 			break;
+
 		}
 
 		System.out.println("Regisered Info: "+url+" bounds: "+boundaries);
