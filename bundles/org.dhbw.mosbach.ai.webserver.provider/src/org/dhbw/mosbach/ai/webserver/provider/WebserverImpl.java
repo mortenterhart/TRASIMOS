@@ -91,7 +91,7 @@ public class WebserverImpl implements IWebserver {
 
     @GET
     @Path("/getV2Positions")
-    @Produces(MediaType.APPLICATION_JSON)d
+    @Produces(MediaType.APPLICATION_JSON)
     public List<Position> getV2Positions() {
         return new ArrayList<>(v2Positions.values());
     }
