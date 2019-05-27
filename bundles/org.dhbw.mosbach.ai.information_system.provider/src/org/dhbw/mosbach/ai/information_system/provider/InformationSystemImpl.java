@@ -2,22 +2,28 @@ package org.dhbw.mosbach.ai.information_system.provider;
 
 import org.dhbw.mosbach.ai.base.MapChunk;
 import org.dhbw.mosbach.ai.base.Position;
+import org.dhbw.mosbach.ai.base.Radio.BroadcastConsumer;
+import org.dhbw.mosbach.ai.base.Radio.Configuration;
 import org.dhbw.mosbach.ai.base.V2Info;
 import org.dhbw.mosbach.ai.information_system.api.IInformationSystem;
 import org.dhbw.mosbach.ai.information_system.api.IPublishPosition;
+import org.dhbw.mosbach.ai.name_server.api.NameServerSOAP;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 
+import javax.annotation.PostConstruct;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
+import java.net.Inet4Address;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,13 +33,57 @@ import java.util.Map;
 public class InformationSystemImpl implements IPublishPosition, IInformationSystem {
     private HashMap<Long, V2Info> vehiclesToObserve;
     private MapChunk areaBoundaries;
+    private BroadcastConsumer nameListener;
+    private String nameserviceURL;
+    private String serviceURL;
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
         System.out.println("Information system booting ...");
         System.out.println("Try to register at name server ...");
         vehiclesToObserve = new HashMap<>();
+        startListener();
+        try {
+            serviceURL = "http://"+ Inet4Address.getLocalHost().getHostAddress()+ ":12002/informationServiceSOAP";
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
+
+
+    public void startListener(){
+        //Listen to Nameserver
+        nameListener = new BroadcastConsumer(Configuration.NameService_multiCastAddress,Configuration.NameService_multiCastPort);
+        Thread nameListenerThread = new Thread(nameListener);
+        nameListenerThread.start();
+    }
+
+    @PostConstruct
+    public void postConstruct(){
+        while (nameListener.isServiceFound()==false){
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        nameserviceURL = nameListener.getServiceURLs().get(0);
+        try {
+            NameServerSOAP nameServerSOAP = new NameServerSOAP(nameserviceURL);
+            String bounds =  nameServerSOAP.registerInfoServer(serviceURL);
+
+            setAreaBoundaries(new MapChunk(bounds));
+
+            IInformationSystem impl = new InformationSystemImpl();
+            Object implementor = impl;
+            String address = "http://0.0.0.0:12002/InformationServer";
+            Endpoint.publish(address, implementor);
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Deactivate
     public void deactivate() {
@@ -87,6 +137,8 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         }
         return null;
     }
+
+
 
     /**
      * get neighbours of position in a specific radius
@@ -146,10 +198,10 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
     private boolean isVehicleNearBoundary(Position position, double speed) {
         double stoppingDistance = calcStoppingDistance(speed);
-        return position.latitude > (areaBoundaries.getBottomLeft().longitude + stoppingDistance) &&
-                position.latitude < (areaBoundaries.getBottomRight().longitude - stoppingDistance) &&
-                position.latitude < (areaBoundaries.getTopLeft().longitude - stoppingDistance) &&
-                position.latitude > (areaBoundaries.getBottomLeft().longitude + stoppingDistance);
+        return position.latitude > (areaBoundaries.getTopLeft().latitude - stoppingDistance) ||
+                position.latitude < (areaBoundaries.getBottomLeft().latitude + stoppingDistance) ||
+                position.longitude < (areaBoundaries.getTopLeft().longitude + stoppingDistance) ||
+                position.longitude > (areaBoundaries.getTopRight().longitude - stoppingDistance);
     }
 
     private double calcStoppingDistance(double speed) {
@@ -164,12 +216,9 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         this.areaBoundaries = areaBoundaries;
     }
 
-
-
     /*
         Fabi test zum starten von Zervice
     */
-
     public static void main(String args[]) {
 
         //START SERVICES
