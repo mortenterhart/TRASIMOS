@@ -95,7 +95,7 @@ public class ServiceConverter {
 
                 byte[] jsonBytes = Arrays.copyOfRange(receivedData, 8, length);
                 String json = new String(jsonBytes);
-                System.out.println(json);
+                //System.out.println(json);
                 int recHash = calclulateHash(json);
                 if (hash == recHash) {
                     Gson g = new Gson();

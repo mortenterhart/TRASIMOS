@@ -43,6 +43,11 @@ public class V2SOAP implements IV2{
     }
 
     @Override
+    public void reduceSpeed() {
+        iv2.reduceSpeed();
+    }
+
+    @Override
     public long getId() {
         return iv2.getId();
     }
