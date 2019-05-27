@@ -9,6 +9,7 @@ import org.dhbw.mosbach.ai.information_system.api.InformationSOAP;
 import org.dhbw.mosbach.ai.name_server.api.NameServerSOAP;
 import org.dhbw.mosbach.ai.v2.api.IV2;
 import org.dhbw.mosbach.ai.v2.api.V2SOAP;
+import org.dhbw.mosbach.ai.webserver.api.WebserverSOAP;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -43,6 +44,7 @@ public class V2Impl implements IV2, Runnable {
     private Position direction;
     private volatile ArrayList<Position> routePositions;
     private volatile double velocity;
+    private String webURL;
     private int nextRoutePositionIndex;
     private String SOAPURL;
     private volatile String infoWsdl;
@@ -113,7 +115,19 @@ public class V2Impl implements IV2, Runnable {
             }
         }
 
+        while (webListener.isServiceFound()==false){
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         try {
+
+            String webserverURL = webListener.getServiceURLs().get(0);
+            webserverSOAP = new WebserverSOAP(webserverURL);
+
             String nameServerURL = nameListener.getServiceURLs().get(0);
             infoWsdl = getInformationService(nameServerURL, currentPosition);
             informationSOAP = new InformationSOAP(infoWsdl);
@@ -374,10 +388,6 @@ public class V2Impl implements IV2, Runnable {
         return new ArrayList<>();
     }
 
-    public boolean publishPositionToWebserver(String wsdl) {
-        // TODO: cant implement yet
-        return true;
-    }
 
     private NameServerSOAP nameServerSOAP;
 
@@ -391,10 +401,12 @@ public class V2Impl implements IV2, Runnable {
     //Publish position to @Param url to Inforservice return false => get new Infoservice
     public boolean publishPositionToInfoserver(String wsdl) throws MalformedURLException {
         V2Info v2Info = getV2Information();
+        webserverSOAP.receivePosition(v2Info);
         return informationSOAP.receivePosition(v2Info);
     }
 
     InformationSOAP informationSOAP;
+    WebserverSOAP webserverSOAP;
 
     public ArrayList<V2Info> getNeighboursFromInfo(String wsdl) throws MalformedURLException {
         return informationSOAP.getNeighbours(getV2Information());
