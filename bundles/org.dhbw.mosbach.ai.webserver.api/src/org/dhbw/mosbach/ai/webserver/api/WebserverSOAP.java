@@ -17,7 +17,7 @@ public class WebserverSOAP implements IWebserver{
     public WebserverSOAP(String v2URL) throws MalformedURLException {
         //CREATE KLIENTÉL
         URL wsdlUrl =  new URL(v2URL);
-        QName qname = new QName(Configuration.V2_NameSpace,Configuration.V2_Local_Part);
+        QName qname = new QName("http://provider.webserver.ai.mosbach.dhbw.org/","WebserverImplService");
         Service service = Service.create(wsdlUrl, qname);
         iWebserver  = service.getPort(IWebserver.class);
 

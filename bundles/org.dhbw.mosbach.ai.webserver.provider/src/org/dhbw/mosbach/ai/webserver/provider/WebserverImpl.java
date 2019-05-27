@@ -84,14 +84,14 @@ public class WebserverImpl implements IWebserver {
     @WebMethod
     public void registerV2Factory(String soapURL) throws MalformedURLException {
         URL wsdlURL = new URL(soapURL + "?wsdl");
-        QName qname = new QName("http://provider.webserver.ai.mosbach.dhbw.org/", "WebserverImplService");
+        QName qname = new QName("http://factory.v2.ai.mosbach.dhbw.org/", "FactoryServiceService");
         Service reference = Service.create(wsdlURL, qname);
         this.v2Factory = reference.getPort(IV2Factory.class);
     }
 
     @GET
     @Path("/getV2Positions")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)d
     public List<Position> getV2Positions() {
         return new ArrayList<>(v2Positions.values());
     }
