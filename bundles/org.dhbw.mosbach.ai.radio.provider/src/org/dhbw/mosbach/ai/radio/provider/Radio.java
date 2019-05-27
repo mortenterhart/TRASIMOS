@@ -21,13 +21,13 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
-        System.out.println("V2 booting ...");
+        System.out.println("Radio booting ...");
 
     }
 
     @Deactivate
     public void deactivate() {
-        System.out.println("V2 shutting down ...");
+        System.out.println("Radio shutting down ...");
     }
 
     BroadcastPublisher radioPublish;
