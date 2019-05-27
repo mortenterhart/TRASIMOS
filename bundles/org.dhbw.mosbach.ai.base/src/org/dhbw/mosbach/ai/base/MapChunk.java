@@ -78,14 +78,13 @@ public class MapChunk {
 
         System.out.println("RESULT Fabian : INBOUNDS "+(latitude&&longtitude));
 
-        /*
         boolean a = p.getLatitude()  >= this.bottomLeft.getLatitude();
         boolean b =p.getLatitude()  <= this.topRight.getLatitude()    ;
         boolean c =       p.getLongitude() >= this.bottomLeft.getLongitude() ;
-           boolean d=     p.getLongitude() <= this.topRight.getLongitude();
+        boolean d=     p.getLongitude() <= this.topRight.getLongitude();
 
         System.out.println("Result MICHA: INBOUNDS"+(a&&b&&c&&d));
-        */
+
         return (latitude&&longtitude);
     }
 
