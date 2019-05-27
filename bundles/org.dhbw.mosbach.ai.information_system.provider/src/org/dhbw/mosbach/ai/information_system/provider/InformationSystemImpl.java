@@ -29,46 +29,37 @@ import java.util.HashMap;
 import java.util.Map;
 
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.information_system.api.IInformationSystem")
-@Component(name = "information-system", service = {IInformationSystem.class, IPublishPosition.class}, immediate = true)
+@Component(name = "information-system", service = {IInformationSystem.class, IPublishPosition.class})
 public class InformationSystemImpl implements IPublishPosition, IInformationSystem {
+
+    public volatile static int id = 0;
     private HashMap<Long, V2Info> vehiclesToObserve;
     private MapChunk areaBoundaries;
     private BroadcastConsumer nameListener;
     private String nameserviceURL;
     private String serviceURL;
+    private boolean activationDone=false;
 
+
+    private synchronized int getCurrID(){
+        id++;
+        return id;
+    }
 
     public InformationSystemImpl(){
-        super();
-    }
-
-    public InformationSystemImpl(MapChunk mapChunk){
-        this.areaBoundaries = mapChunk;
-    }
-
-    @Activate
-    public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
+        int id = getCurrID();
         System.out.println("Information system booting ...");
         System.out.println("Try to register at name server ...");
         vehiclesToObserve = new HashMap<>();
         startListener();
         try {
-            serviceURL = "http://"+ Inet4Address.getLocalHost().getHostAddress()+ ":12002/informationServiceSOAP";
+            serviceURL = "http://" + Inet4Address.getLocalHost().getHostAddress() + ":12002/"+id+"/InformationServer";
+
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-    }
+        activationDone=true;
 
-
-    public void startListener(){
-        //Listen to Nameserver
-        nameListener = new BroadcastConsumer(Configuration.NameService_multiCastAddress,Configuration.NameService_multiCastPort);
-        Thread nameListenerThread = new Thread(nameListener);
-        nameListenerThread.start();
-    }
-
-    @PostConstruct
-    public void postConstruct(){
         while (nameListener.isServiceFound()==false){
             try {
                 Thread.sleep(100);
@@ -81,15 +72,31 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
             NameServerSOAP nameServerSOAP = new NameServerSOAP(nameserviceURL);
             String bounds =  nameServerSOAP.registerInfoServer(serviceURL);
 
-            IInformationSystem impl = new InformationSystemImpl(new MapChunk(bounds));
+            setAreaBoundaries(new MapChunk(bounds));
+
+            IInformationSystem impl = this;
             Object implementor = impl;
-            String address = "http://0.0.0.0:12002/InformationServer";
+            String address = "http://0.0.0.0:12002/"+id+"/InformationServer";
             Endpoint.publish(address, implementor);
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
     }
+
+    @Activate
+    public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
+
+    }
+
+
+    public void startListener(){
+        //Listen to Nameserver
+        nameListener = new BroadcastConsumer(Configuration.NameService_multiCastAddress,Configuration.NameService_multiCastPort);
+        Thread nameListenerThread = new Thread(nameListener);
+        nameListenerThread.start();
+    }
+
 
 
     @Deactivate
@@ -102,14 +109,20 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     @WebMethod
     public boolean receivePosition(V2Info v2Info) {
 
-        System.out.println("SERVER: I RECEIVED A RECEIVE POSITION REQUEST");
-        System.out.println("SERVER: CAR ID " + v2Info.V2id);
-        System.out.println("SERVER: Position " + v2Info.position.latitude + "|" + v2Info.position.longitude);
-        // Add/Update vehicle in Map
-        // if vehicle id already exists the position of vehicle will be overridden
-        if (isVehicleInBoundary(v2Info.position)) {
-            vehiclesToObserve.put(v2Info.V2id, v2Info);
-            return true;
+        try{
+
+            System.out.println("SERVER: I RECEIVED A RECEIVE POSITION REQUEST");
+            System.out.println("SERVER: CAR ID " + v2Info.V2id);
+            System.out.println("SERVER: Position " + v2Info.position.latitude + "|" + v2Info.position.longitude);
+            // Add/Update vehicle in Map
+            // if vehicle id already exists the position of vehicle will be overridden
+            if (isVehicleInBoundary(v2Info.position)) {
+                vehiclesToObserve.put(v2Info.V2id, v2Info);
+                return true;
+            }
+
+        }catch (Exception exp){
+            System.out.println("Failed receive Position");
         }
         return false;
     }
@@ -125,24 +138,27 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     @WebMethod
     public ArrayList<V2Info> getNeighbours(V2Info v2Info) {
         // If vehicle is new, neighbours can not be resolved
-        // Vehicle needs to publish its position first
-        if (isVehicleKnown(v2Info.V2id)) {
-            ArrayList<V2Info> positionOfNeighbours = new ArrayList<>();
-            // Check if vehicle is too close at boundary. If confirmed getNeighbours from other information systems
 
-            if (isVehicleNearBoundary(v2Info.position, v2Info.speed)) {
-                // Vehicle to close at boundary
-                // TODO: Ask other servers
-            }
-            // Add neighbours in boundary
-            for (V2Info info : vehiclesToObserve.values()) {
-                if (distanceBetweenPositions(v2Info.position, info.position) <= calcStoppingDistance(v2Info.speed)) {
-                    positionOfNeighbours.add(info);
+        if(v2Info.speed != 0.0) {
+            // Vehicle needs to publish its position first
+            if (isVehicleKnown(v2Info.V2id)) {
+                ArrayList<V2Info> positionOfNeighbours = new ArrayList<>();
+                // Check if vehicle is too close at boundary. If confirmed getNeighboursRemote from other information systems
+
+                if (isVehicleNearBoundary(v2Info.position, v2Info.speed)) {
+                    // Vehicle to close at boundary
+                    // TODO: Ask other servers
                 }
+                // Add neighbours in boundary
+                for (V2Info info : vehiclesToObserve.values()) {
+                    if (distanceBetweenPositions(v2Info.position, info.position) <= calcStoppingDistance(v2Info.speed)) {
+                        positionOfNeighbours.add(info);
+                    }
+                }
+                return positionOfNeighbours;
             }
-            return positionOfNeighbours;
         }
-        return null;
+        return new ArrayList<>();
     }
 
 
@@ -156,7 +172,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
      */
     @Override
     @WebMethod
-    public ArrayList<V2Info> getNeighbours(Position position, double radius) {
+    public ArrayList<V2Info> getNeighboursRemote(Position position, double radius) {
         ArrayList<V2Info> positionOfNeighbours = new ArrayList<>();
 
         for (V2Info info : vehiclesToObserve.values()) {
@@ -177,6 +193,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     @WebMethod
     public void receiveFinished(V2Info v2Info) {
         vehiclesToObserve.remove(v2Info.V2id);
+        System.out.println("FINISH RECEIVED ___ REMOVE CAR WITH ID "+v2Info.V2id);
     }
 
 
@@ -212,7 +229,9 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     }
 
     private double calcStoppingDistance(double speed) {
-        return (speed / 10 * 3) + (speed / 10 * speed / 10);
+        if (speed!=0) {
+            return (speed / 10 * 3) + (speed / 10 * speed / 10);
+        }else return 0;
     }
 
     public MapChunk getAreaBoundaries() {
@@ -221,43 +240,6 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
     public void setAreaBoundaries(MapChunk areaBoundaries) {
         this.areaBoundaries = areaBoundaries;
-    }
-
-    /*
-        Fabi test zum starten von Zervice
-    */
-    public static void main(String args[]) {
-
-        //START SERVICES
-        IInformationSystem impl = new InformationSystemImpl();
-        Object implementor = impl;
-        String address = "http://localhost:9001/extremeCoolSoapApi";
-        Endpoint.publish(address, implementor);
-
-        //WAIT FOR BETTER WETTER
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        //CREATE KLIENTÉL
-        URL wsdlUrl = null;
-        try {
-            wsdlUrl = new URL(address);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        QName qname = new QName("http://provider.information_system.ai.mosbach.dhbw.org/", "InformationSystemImplService");
-        Service service = Service.create(wsdlUrl, qname);
-        IInformationSystem iInformationSystem = service.getPort(IInformationSystem.class);
-
-
-        //Make some cool Queries
-        while (true) {
-
-        }
     }
 
 }
