@@ -13,7 +13,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 
-@Component(name = "v2-factory", service = V2Factory.class)
+@Component(name = "v2-factory", service = V2Factory.class, immediate = true)
 public class V2Factory implements IV2Factory {
 
     private List<Thread> cars = new ArrayList<>();
