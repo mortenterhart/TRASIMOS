@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.information_system.api.IInformationSystem")
-@Component(name = "information-system", service = {IInformationSystem.class, IPublishPosition.class})
+@Component(name = "information-system", service = {IInformationSystem.class, IPublishPosition.class}, immediate = true)
 public class InformationSystemImpl implements IPublishPosition, IInformationSystem {
 
     public volatile static int id = 0;

@@ -15,9 +15,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 
-@Component(name = "radio",service = IRadio.class)
+@Component(name = "radio",service = IRadio.class, immediate = true)
 public class Radio implements Runnable, IRegisterListener,IRadio  {
-
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
@@ -199,6 +198,6 @@ public class Radio implements Runnable, IRegisterListener,IRadio  {
 
     @Override
     public void registerServiceAccess(String url, String serviceTyp) {
-        registerService.registerServiceAccess(url,serviceTyp);
+        registerService.registerServiceAccess(url, serviceTyp);
     }
 }
