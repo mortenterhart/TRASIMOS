@@ -39,7 +39,7 @@ public class V2Impl implements IV2, Runnable {
     private long id;
     private Position origin;
     private Position destination;
-    private Position currentPosition;
+    private volatile Position currentPosition;
     private Position direction;
     private volatile ArrayList<Position> routePositions;
     private volatile double velocity;
@@ -63,6 +63,7 @@ public class V2Impl implements IV2, Runnable {
     public V2Impl(long id, double originLongitude, double originLatitude, double destinationLongitude, double destinationLatitude, double maxVelocity) throws UnknownHostException {
         this.id = id;
         velocity = 0.0;
+        direction = new Position(0,0);
         this.maxVelocity = maxVelocity;
         origin = new Position(originLongitude, originLatitude);
         destination = new Position(destinationLongitude, destinationLatitude);
@@ -164,6 +165,7 @@ public class V2Impl implements IV2, Runnable {
         String urlString = "http://141.72.191.30:5000/route/v1/driving/"
                 + origin.longitude + "," + origin.latitude + ";" + destination.longitude + "," + destination.latitude +
                 "?steps=true&alternatives=true&geometries=geojson";
+        System.out.println(urlString);
         try {
             URL url = new URL(urlString);
             reader = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -238,31 +240,20 @@ public class V2Impl implements IV2, Runnable {
 
         while (currentPosition != destination) {
             try {
-                while (currentPosition.getLongitude() != this.routePositions.get(nextRoutePositionIndex).getLongitude()) {
+                while (routePositions.size()>nextRoutePositionIndex && currentPosition.getLongitude() != this.routePositions.get(nextRoutePositionIndex).getLongitude() && currentPosition.getLatitude() != this.routePositions.get(nextRoutePositionIndex).getLatitude()) {
                     Thread.sleep(TIMEOUT);
                     publishPosition();
                     //diceBraking();
-                    calculateDirection(currentPosition,this.routePositions.get(nextRoutePositionIndex));
-                    drive(
-                            currentPosition.getLatitude(), currentPosition.getLongitude(),
-                            currentPosition.getLatitude(), this.routePositions.get(nextRoutePositionIndex).getLongitude()
-                    );
-
-                    publishPosition();
-
-                    System.out.println("id: "+ id +" Pos: "+currentPosition.latitude+"|"+currentPosition.longitude);
-                }
-                while (currentPosition.getLatitude() != this.routePositions.get(nextRoutePositionIndex).getLatitude()) {
-                    Thread.sleep(TIMEOUT);
-                    //diceBraking(); this would be fun, for sure
                     properBraking();
                     accelerate();
-                    drive(
+                    calculateDirection(currentPosition,this.routePositions.get(nextRoutePositionIndex));
+                    currentPosition = drive(
                             currentPosition.getLatitude(), currentPosition.getLongitude(),
-                            this.routePositions.get(nextRoutePositionIndex).getLatitude(), currentPosition.getLongitude()
+                            this.routePositions.get(nextRoutePositionIndex).getLatitude(), this.routePositions.get(nextRoutePositionIndex).getLongitude()
                     );
 
                     publishPosition();
+
                     System.out.println("id: "+ id +" Pos: "+currentPosition.latitude+"|"+currentPosition.longitude);
                 }
                 nextRoutePositionIndex++;
@@ -309,28 +300,26 @@ public class V2Impl implements IV2, Runnable {
 
 
     // happens in one second
-    public void drive(double x1, double y1, double x2, double y2) {
+    public Position drive(double x1, double y1, double x2, double y2) {
         System.out.println("Driving");
         double distance = distance(x1, y1, x2, y2);
         double distanceV2CanDrive = velocity / 3.6;
-        if (distance <= distanceV2CanDrive) {
-            currentPosition.latitude = x2;
-            currentPosition.longitude = y2;
-        } else {
-            if (x1 == x2) {
-                if (y1 < y2) {
-                    currentPosition = positionPlusDistance(x1, y2, distance, 90);
-                } else {
-                    currentPosition = positionPlusDistance(x1, y2, distance, 270);
-                }
-            } else {
-                if (x1 < x2) {
-                    currentPosition = positionPlusDistance(x1, y2, distance, 180);
-                } else {
-                    currentPosition = positionPlusDistance(x1, y2, distance, 0);
-                }
-            }
+        Position resultingVector = new Position();
+        resultingVector.latitude = x2-x1;
+        resultingVector.longitude = y2-y1;
 
+        if(distance-distanceV2CanDrive>0){
+
+            double factor = 1 - (distance-distanceV2CanDrive)/(distance); //Prozentual way made to next checkpoint
+
+            Position newPosition = new Position();
+            newPosition.latitude = x1-resultingVector.latitude*factor;
+            newPosition.longitude = y1-resultingVector.longitude*factor;
+
+            return newPosition;
+
+        }else{
+            return new Position(x2,y2);
         }
     }
 
@@ -400,7 +389,8 @@ public class V2Impl implements IV2, Runnable {
     //Publish position to @Param url to Inforservice return false => get new Infoservice
     public boolean publishPositionToInfoserver(String wsdl) throws MalformedURLException {
         InformationSOAP informationSOAP = new InformationSOAP(wsdl);
-        return informationSOAP.receivePosition(getV2Information());
+        V2Info v2Info = getV2Information();
+        return informationSOAP.receivePosition(v2Info);
     }
 
     public ArrayList<V2Info> getNeighboursFromInfo(String wsdl) throws MalformedURLException {

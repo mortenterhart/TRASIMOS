@@ -40,21 +40,25 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     private String serviceURL;
     private boolean actvationDone=false;
 
-    @Activate
-    public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
 
-             id ++;
-           System.out.println("Information system booting ...");
-            System.out.println("Try to register at name server ...");
-            vehiclesToObserve = new HashMap<>();
-            startListener();
-            try {
-                serviceURL = "http://" + Inet4Address.getLocalHost().getHostAddress() + ":12002/"+id+"/InformationServer";
+    private synchronized int getCurrID(){
+        id++;
+        return id;
+    }
 
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-            actvationDone=true;
+    public InformationSystemImpl(){
+        int id = getCurrID();
+        System.out.println("Information system booting ...");
+        System.out.println("Try to register at name server ...");
+        vehiclesToObserve = new HashMap<>();
+        startListener();
+        try {
+            serviceURL = "http://" + Inet4Address.getLocalHost().getHostAddress() + ":12002/"+id+"/InformationServer";
+
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        actvationDone=true;
 
         while (nameListener.isServiceFound()==false){
             try {
@@ -70,7 +74,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
             convertBoundaries(bounds);
 
-            IInformationSystem impl = new InformationSystemImpl();
+            IInformationSystem impl = this;
             Object implementor = impl;
             String address = "http://0.0.0.0:12002/"+id+"/InformationServer";
             Endpoint.publish(address, implementor);
@@ -78,6 +82,11 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Activate
+    public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
+
     }
 
 
@@ -100,6 +109,8 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     @WebMethod
     public boolean receivePosition(V2Info v2Info) {
 
+        try{
+
         System.out.println("SERVER: I RECEIVED A RECEIVE POSITION REQUEST");
         System.out.println("SERVER: CAR ID " + v2Info.V2id);
         System.out.println("SERVER: Position " + v2Info.position.latitude + "|" + v2Info.position.longitude);
@@ -108,6 +119,10 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         if (isVehicleInBoundary(v2Info.position)) {
             vehiclesToObserve.put(v2Info.V2id, v2Info);
             return true;
+        }
+
+        }catch (Exception exp){
+            System.out.println("Failed receive Position");
         }
         return false;
     }
@@ -210,7 +225,9 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     }
 
     private double calcStoppingDistance(double speed) {
-        return (speed / 10 * 3) + (speed / 10 * speed / 10);
+        if (speed!=0) {
+            return (speed / 10 * 3) + (speed / 10 * speed / 10);
+        }else return 0;
     }
 
     public MapChunk getAreaBoundaries() {
@@ -253,42 +270,5 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         setAreaBoundaries(mapChunk);
     }
 
-
-    /*
-        Fabi test zum starten von Zervice
-    */
-    public static void main(String args[]) {
-
-        //START SERVICES
-        IInformationSystem impl = new InformationSystemImpl();
-        Object implementor = impl;
-        String address = "http://localhost:9001/extremeCoolSoapApi";
-        Endpoint.publish(address, implementor);
-
-        //WAIT FOR BETTER WETTER
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        //CREATE KLIENTÉL
-        URL wsdlUrl = null;
-        try {
-            wsdlUrl = new URL(address);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        QName qname = new QName("http://provider.information_system.ai.mosbach.dhbw.org/", "InformationSystemImplService");
-        Service service = Service.create(wsdlUrl, qname);
-        IInformationSystem iInformationSystem = service.getPort(IInformationSystem.class);
-
-
-        //Make some cool Queries
-        while (true) {
-
-        }
-    }
 
 }

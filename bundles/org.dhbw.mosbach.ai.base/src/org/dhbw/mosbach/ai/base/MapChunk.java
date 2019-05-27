@@ -63,13 +63,33 @@ public class MapChunk {
     }
 
     public boolean isWithin(Position p) {
-        if (topLeft.latitude >= p.latitude && p.latitude >= bottomLeft.latitude) {
-            if (topLeft.longitude <= topRight.longitude && topLeft.longitude <= p.longitude && p.longitude <= topRight.longitude) {
-                return true;
-            } else if (topLeft.longitude > topRight.longitude && (topLeft.longitude <= p.longitude || p.longitude <= topRight.longitude)) {
-                return true;
-            }
-        }
-        return false;
+
+        System.out.println("_______POINT________");
+        System.out.println(posToString(p));
+        System.out.println("_______Bounds_______");
+        System.out.println(posToString(topLeft)+"_____"+posToString(topRight));
+        System.out.println("................................................");
+        System.out.println(posToString(bottomLeft)+"_____"+posToString(bottomRight));
+        System.out.println("____________________________________________________-");
+
+
+        boolean latitude = topLeft.latitude <= p.latitude && bottomRight.latitude >= p.latitude;
+        boolean longtitude = topLeft.longitude <= p.longitude && bottomRight.longitude >= p.longitude;
+
+        System.out.println("RESULT Fabian : INBOUNDS "+(latitude&&longtitude));
+
+        /*
+        boolean a = p.getLatitude()  >= this.bottomLeft.getLatitude();
+        boolean b =p.getLatitude()  <= this.topRight.getLatitude()    ;
+        boolean c =       p.getLongitude() >= this.bottomLeft.getLongitude() ;
+           boolean d=     p.getLongitude() <= this.topRight.getLongitude();
+
+        System.out.println("Result MICHA: INBOUNDS"+(a&&b&&c&&d));
+        */
+        return (latitude&&longtitude);
+    }
+
+    public String posToString(Position p){
+        return "Lat: "+p.getLatitude()+" Long "+p.getLongitude();
     }
 }
