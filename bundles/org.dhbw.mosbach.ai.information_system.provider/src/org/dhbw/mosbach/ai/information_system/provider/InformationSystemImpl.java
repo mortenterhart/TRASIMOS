@@ -71,7 +71,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
             NameServerSOAP nameServerSOAP = new NameServerSOAP(nameserviceURL);
             String bounds =  nameServerSOAP.registerInfoServer(serviceURL);
 
-            convertBoundaries(bounds);
+            setAreaBoundaries(new MapChunk(bounds));
 
             IInformationSystem impl = this;
             Object implementor = impl;
