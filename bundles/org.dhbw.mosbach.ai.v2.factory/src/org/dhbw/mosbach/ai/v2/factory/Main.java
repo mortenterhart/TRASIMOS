@@ -4,7 +4,7 @@ public class Main {
     public static void main(String args[]){
         V2Factory v2Factory = new V2Factory();
         v2Factory.activate(null, null, null);
-        v2Factory.createV2Cars(1);
+        v2Factory.createV2Cars(5);
         while (true);
     }
 }

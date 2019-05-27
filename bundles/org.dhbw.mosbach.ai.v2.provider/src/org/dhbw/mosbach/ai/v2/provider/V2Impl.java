@@ -34,7 +34,7 @@ import java.util.*;
 public class V2Impl implements IV2, Runnable {
 
     static class Route{
-        private ArrayList<Position> routePositions;
+        private ArrayList<Position> getRouteDummy;
     }
     private long id;
     private Position origin;
@@ -67,8 +67,13 @@ public class V2Impl implements IV2, Runnable {
         this.maxVelocity = maxVelocity;
         origin = new Position(originLongitude, originLatitude);
         destination = new Position(destinationLongitude, destinationLatitude);
-        currentPosition = origin;
-        routePositions = getRoutePositions();
+
+        //TODO REPLACE WENN DER SCHEiß SERVER WIEDER UP is
+        routePositions = getRouteDummy();
+        origin = routePositions.get(0);
+        destination = routePositions.get(2);
+        currentPosition = new Position(origin.longitude,origin.latitude);
+
         nextRoutePositionIndex = 0;
 
         //2. Listen to Nameserver
@@ -111,6 +116,7 @@ public class V2Impl implements IV2, Runnable {
         try {
             String nameServerURL = nameListener.getServiceURLs().get(0);
             infoWsdl = getInformationService(nameServerURL, currentPosition);
+            informationSOAP = new InformationSOAP(infoWsdl);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -126,6 +132,19 @@ public class V2Impl implements IV2, Runnable {
     @Deactivate
     public void deactivate() {
         System.out.println("V2 shutting down ...");
+    }
+
+
+    public ArrayList<Position> getRouteDummy(){
+        ArrayList<Position> positions = new ArrayList<>();
+
+
+        positions.add(new Position(	49.303717, 9.002668));
+        positions.add(new Position(	49.308762, 9.001426));
+        positions.add(new Position(	49.320000,9.084893));
+
+        return positions;
+
     }
 
 
@@ -242,17 +261,17 @@ public class V2Impl implements IV2, Runnable {
             try {
                 while (routePositions.size()>nextRoutePositionIndex && currentPosition.getLongitude() != this.routePositions.get(nextRoutePositionIndex).getLongitude() && currentPosition.getLatitude() != this.routePositions.get(nextRoutePositionIndex).getLatitude()) {
                     Thread.sleep(TIMEOUT);
+
+
                     publishPosition();
                     //diceBraking();
                     properBraking();
                     accelerate();
                     calculateDirection(currentPosition,this.routePositions.get(nextRoutePositionIndex));
-                    currentPosition = drive(
+                     currentPosition = drive(
                             currentPosition.getLatitude(), currentPosition.getLongitude(),
                             this.routePositions.get(nextRoutePositionIndex).getLatitude(), this.routePositions.get(nextRoutePositionIndex).getLongitude()
                     );
-
-                    publishPosition();
 
                     System.out.println("id: "+ id +" Pos: "+currentPosition.latitude+"|"+currentPosition.longitude);
                 }
@@ -298,12 +317,10 @@ public class V2Impl implements IV2, Runnable {
         return new ArrayList<>();
     }
 
-
-    // happens in one second
     public Position drive(double x1, double y1, double x2, double y2) {
         System.out.println("Driving");
         double distance = distance(x1, y1, x2, y2);
-        double distanceV2CanDrive = velocity / 3.6;
+        double distanceV2CanDrive = 100 / 3.6;
         Position resultingVector = new Position();
         resultingVector.latitude = x2-x1;
         resultingVector.longitude = y2-y1;
@@ -313,20 +330,21 @@ public class V2Impl implements IV2, Runnable {
             double factor = 1 - (distance-distanceV2CanDrive)/(distance); //Prozentual way made to next checkpoint
 
             Position newPosition = new Position();
-            newPosition.latitude = x1-resultingVector.latitude*factor;
-            newPosition.longitude = y1-resultingVector.longitude*factor;
+            newPosition.latitude = x1+resultingVector.latitude*factor;
+            newPosition.longitude = y1+resultingVector.longitude*factor;
 
             return newPosition;
 
         }else{
-            return new Position(x2,y2);
+            return new Position(y2,x2);
         }
+
     }
+
 
     public static double distance(double lat1, double lon1, double lat2, double lon2) {
 
         final int R = 6371; // Radius of the earth
-
         double latDistance = Math.toRadians(lat2 - lat1);
         double lonDistance = Math.toRadians(lon2 - lon1);
         double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
@@ -334,26 +352,9 @@ public class V2Impl implements IV2, Runnable {
                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double distance = R * c * 1000; // convert to meters
-
         distance = Math.pow(distance, 2);
-
         return Math.sqrt(distance);
     }
-
-    public static Position positionPlusDistance(double latitude, double longitude, double distance, double bearing) {
-        double R = 6378.1; //Radius of the Earth
-        bearing = Math.toRadians(bearing); //Bearing is 90 degrees converted to radians.
-        double d = distance * 3.6; //Distance in km
-
-        latitude = Math.toRadians(latitude); //Current lat point converted to radians
-        longitude = Math.toRadians(longitude); //Current long point converted to radians
-
-        double latitude2 = Math.asin(Math.sin(latitude) * Math.cos(d / R) + Math.cos(latitude) * Math.sin(d / R) * Math.cos(bearing));
-        double longitude2 = longitude + Math.atan2(Math.sin(bearing) * Math.sin(d / R) * Math.cos(latitude), Math.cos(d / R) - Math.sin(latitude) * Math.sin(latitude2));
-
-        return new Position(longitude2, latitude2);
-    }
-
 
     //GET URLS OF ALL NAMESERVICES; WILL ONLY BE ONE BUT FOR FUTURE !!
     public ArrayList<String> getNameServerUrl() {
@@ -386,27 +387,28 @@ public class V2Impl implements IV2, Runnable {
         return nameServerSOAP.getInfoServer(position);
     }
 
+
     //Publish position to @Param url to Inforservice return false => get new Infoservice
     public boolean publishPositionToInfoserver(String wsdl) throws MalformedURLException {
-        InformationSOAP informationSOAP = new InformationSOAP(wsdl);
         V2Info v2Info = getV2Information();
         return informationSOAP.receivePosition(v2Info);
     }
 
+    InformationSOAP informationSOAP;
+
     public ArrayList<V2Info> getNeighboursFromInfo(String wsdl) throws MalformedURLException {
-        InformationSOAP informationSOAP = new InformationSOAP(wsdl);
         return informationSOAP.getNeighbours(getV2Information());
     }
 
     private void publishPosition() throws MalformedURLException {
         if (!publishPositionToInfoserver(infoWsdl)) {
             infoWsdl = getInformationService(nameListener.getServiceURLs().get(0), currentPosition);
+            informationSOAP = new InformationSOAP(infoWsdl);
             publishPositionToInfoserver(infoWsdl);
         }
     }
 
     private void publishFinished() throws MalformedURLException{
-        InformationSOAP informationSOAP = new InformationSOAP(infoWsdl);
         informationSOAP.receiveFinished(getV2Information());
     }
 

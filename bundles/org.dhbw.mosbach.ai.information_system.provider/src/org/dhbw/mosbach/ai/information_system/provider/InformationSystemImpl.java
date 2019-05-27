@@ -138,24 +138,27 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     @WebMethod
     public ArrayList<V2Info> getNeighbours(V2Info v2Info) {
         // If vehicle is new, neighbours can not be resolved
-        // Vehicle needs to publish its position first
-        if (isVehicleKnown(v2Info.V2id)) {
-            ArrayList<V2Info> positionOfNeighbours = new ArrayList<>();
-            // Check if vehicle is too close at boundary. If confirmed getNeighboursRemote from other information systems
 
-            if (isVehicleNearBoundary(v2Info.position, v2Info.speed)) {
-                // Vehicle to close at boundary
-                // TODO: Ask other servers
-            }
-            // Add neighbours in boundary
-            for (V2Info info : vehiclesToObserve.values()) {
-                if (distanceBetweenPositions(v2Info.position, info.position) <= calcStoppingDistance(v2Info.speed)) {
-                    positionOfNeighbours.add(info);
+        if(v2Info.speed != 0.0) {
+            // Vehicle needs to publish its position first
+            if (isVehicleKnown(v2Info.V2id)) {
+                ArrayList<V2Info> positionOfNeighbours = new ArrayList<>();
+                // Check if vehicle is too close at boundary. If confirmed getNeighboursRemote from other information systems
+
+                if (isVehicleNearBoundary(v2Info.position, v2Info.speed)) {
+                    // Vehicle to close at boundary
+                    // TODO: Ask other servers
                 }
+                // Add neighbours in boundary
+                for (V2Info info : vehiclesToObserve.values()) {
+                    if (distanceBetweenPositions(v2Info.position, info.position) <= calcStoppingDistance(v2Info.speed)) {
+                        positionOfNeighbours.add(info);
+                    }
+                }
+                return positionOfNeighbours;
             }
-            return positionOfNeighbours;
         }
-        return null;
+        return new ArrayList<>();
     }
 
 
@@ -190,6 +193,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
     @WebMethod
     public void receiveFinished(V2Info v2Info) {
         vehiclesToObserve.remove(v2Info.V2id);
+        System.out.println("FINISH RECEIVED ___ REMOVE CAR WITH ID "+v2Info.V2id);
     }
 
 
