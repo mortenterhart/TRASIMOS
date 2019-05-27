@@ -7,9 +7,19 @@ Automatic-Module-Name: org.dhbw.mosbach.ai.information_system.provider
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: org.dhbw.mosbach.ai.base;version="1.0.0",
  org.dhbw.mosbach.ai.information_system.api;version="1.0.0",
+ org.osgi.framework;version="1.9.0",
+ org.osgi.service.component;version="1.4.0",
  org.osgi.service.component.annotations;version="1.3.0";resolution:=optional
+Export-Package: org.apache.cxf.endpoint.dynamic,
+ org.apache.cxf.jaxb,
+ org.apache.cxf.jaxb.attachment,
+ org.apache.cxf.jaxb.io,
+ org.dhbw.mosbach.ai.information_system.provider;version="1.0.0"
+Bundle-ClassPath: lib/cxf-rt-databinding-jaxb-3.3.2.jar,
+ lib/javax.jws-api-1.1.jar,
+ lib/jaxws-api-2.3.1.jar,
+ lib/org.osgi.annotation-6.0.0.jar,
+ lib/rt-2.3.2.jar,
+ bin/,
+ lib/jaxb-api-2.3.1.jar
 Service-Component: OSGI-INF/information-system.xml
-Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.osgi;bundle-version="3.13.300",
- org.eclipse.osgi.services;bundle-version="3.8.0"
-Export-Package: org.dhbw.mosbach.ai.information_system.provider
