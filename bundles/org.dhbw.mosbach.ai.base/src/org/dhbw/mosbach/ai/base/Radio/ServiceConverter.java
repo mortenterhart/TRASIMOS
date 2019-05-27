@@ -23,26 +23,25 @@ import java.util.Arrays;
  */
 public class ServiceConverter {
 
-    public static final byte[] identifier = new byte[]{(byte)10,(byte)20,(byte)30,(byte)40,(byte)50,(byte)60,(byte)70,(byte)80};
+    public static final byte[] identifier = new byte[]{ (byte) 10, (byte) 20, (byte) 30, (byte) 40, (byte) 50, (byte) 60, (byte) 70, (byte) 80 };
 
-    public static ServiceInformation getServiceInformation(byte[] receivedBuffer){
+    public static ServiceInformation getServiceInformation(byte[] receivedBuffer) {
 
-        int index = indexOf(receivedBuffer,identifier);
+        int index = indexOf(receivedBuffer, identifier);
 
-        byte[] lengthBytes = Arrays.copyOfRange(receivedBuffer, index+0+8,index+8+4);
+        byte[] lengthBytes = Arrays.copyOfRange(receivedBuffer, index + 0 + 8, index + 8 + 4);
 
         int length = ByteBuffer.wrap(lengthBytes).getInt();
 
-        if (length+index+8 > receivedBuffer.length){
+        if (length + index + 8 > receivedBuffer.length) {
             return null;
-        }else {
-            byte[] protocol = Arrays.copyOfRange(receivedBuffer,index+8,index+length+8);
+        } else {
+            byte[] protocol = Arrays.copyOfRange(receivedBuffer, index + 8, index + length + 8);
             return convertByteToServiceInformation(protocol);
         }
-
     }
 
-    public static byte[] convertServiceInformationToByte(ServiceInformation serviceInformation){
+    public static byte[] convertServiceInformationToByte(ServiceInformation serviceInformation) {
 
         if (serviceInformation != null) {
 
@@ -56,7 +55,7 @@ public class ServiceConverter {
             int length = jsonBytes.length + hashBytes.length + 4;
             byte[] lengthByte = ByteBuffer.allocate(4).putInt(length).array();
 
-            byte[] result = Bytes.concat(identifier,lengthByte, hashBytes, jsonBytes);
+            byte[] result = Bytes.concat(identifier, lengthByte, hashBytes, jsonBytes);
 
             return result;
         }
@@ -65,20 +64,22 @@ public class ServiceConverter {
     }
 
     public static int indexOf(byte[] outerArray, byte[] smallerArray) {
-        for(int i = 0; i < outerArray.length - smallerArray.length+1; ++i) {
+        for (int i = 0; i < outerArray.length - smallerArray.length + 1; ++i) {
             boolean found = true;
-            for(int j = 0; j < smallerArray.length; ++j) {
-                if (outerArray[i+j] != smallerArray[j]) {
+            for (int j = 0; j < smallerArray.length; ++j) {
+                if (outerArray[i + j] != smallerArray[j]) {
                     found = false;
                     break;
                 }
             }
-            if (found) return i;
+            if (found) {
+                return i;
+            }
         }
         return -1;
     }
 
-    private static ServiceInformation convertByteToServiceInformation(byte[] receivedData){
+    private static ServiceInformation convertByteToServiceInformation(byte[] receivedData) {
 
         if (receivedData.length > 12) {
             //get Length 0..3
@@ -87,7 +88,6 @@ public class ServiceConverter {
             int length = ByteBuffer.wrap(lengthBytes).getInt();
 
             if (receivedData.length == length) {
-
 
                 //Get hash from byte 4-7
                 byte[] hashBytes = Arrays.copyOfRange(receivedData, 4, 8);
@@ -99,21 +99,20 @@ public class ServiceConverter {
                 int recHash = calclulateHash(json);
                 if (hash == recHash) {
                     Gson g = new Gson();
-                    return g.fromJson(json,ServiceInformation.class);
+                    return g.fromJson(json, ServiceInformation.class);
                 }
             }
-
         }
 
         return null;
     }
 
-    public static int calclulateHash(String jsonString){
+    public static int calclulateHash(String jsonString) {
         char[] array = jsonString.toCharArray();
 
-        int hash=0;
-        for (char c:array) {
-            hash+= Math.pow(c,2) % Integer.MAX_VALUE;
+        int hash = 0;
+        for (char c : array) {
+            hash += Math.pow(c, 2) % Integer.MAX_VALUE;
         }
         return hash;
     }

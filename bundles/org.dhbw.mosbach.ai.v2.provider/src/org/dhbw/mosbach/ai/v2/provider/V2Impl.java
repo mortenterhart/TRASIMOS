@@ -1,6 +1,9 @@
 package org.dhbw.mosbach.ai.v2.provider;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.dhbw.mosbach.ai.base.Position;
 import org.dhbw.mosbach.ai.base.Radio.BroadcastConsumer;
 import org.dhbw.mosbach.ai.base.Radio.Configuration;
@@ -26,7 +29,9 @@ import java.net.Inet4Address;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 //import org.dhbw.mosbach.ai.base.Position;
 
@@ -34,9 +39,11 @@ import java.util.*;
 @Component(name = "v2", service = IV2.class, immediate = true)
 public class V2Impl implements IV2, Runnable {
 
-    static class Route{
+    static class Route {
+
         private ArrayList<Position> getRouteDummy;
     }
+
     private long id;
     private Position origin;
     private Position destination;
@@ -52,8 +59,6 @@ public class V2Impl implements IV2, Runnable {
     private double maxVelocity;
     private Route routeList;
 
-
-
     public V2Impl() {
 
     }
@@ -61,11 +66,10 @@ public class V2Impl implements IV2, Runnable {
     BroadcastConsumer nameListener;
     BroadcastConsumer webListener;
 
-
     public V2Impl(long id, double originLongitude, double originLatitude, double destinationLongitude, double destinationLatitude, double maxVelocity) throws UnknownHostException {
         this.id = id;
         velocity = 0.0;
-        direction = new Position(0,0);
+        direction = new Position(0, 0);
         this.maxVelocity = maxVelocity;
         origin = new Position(originLongitude, originLatitude);
         destination = new Position(destinationLongitude, destinationLatitude);
@@ -74,7 +78,7 @@ public class V2Impl implements IV2, Runnable {
         routePositions = getRouteDummy();
         origin = routePositions.get(0);
         destination = routePositions.get(2);
-        currentPosition = new Position(origin.longitude,origin.latitude);
+        currentPosition = new Position(origin.longitude, origin.latitude);
 
         nextRoutePositionIndex = 0;
 
@@ -88,7 +92,6 @@ public class V2Impl implements IV2, Runnable {
         Thread webListenerThread = new Thread(webListener);
         webListenerThread.start();
 
-
         //Start SOAP
         //generate random port
         int port = (int) (Math.random() * (Configuration.V2PortMax - Configuration.V2PortMin)) + Configuration.V2PortMin;
@@ -100,14 +103,12 @@ public class V2Impl implements IV2, Runnable {
 
         String SOAPPublish = Configuration.general_https + "0.0.0.0:" + port + "/" + id + "/" + Configuration.V2SOAP;
 
-
         //Start Service
         Object implementor = this;
         Endpoint.publish(SOAPPublish, implementor);
         System.out.println("OPENING V2-SOAP on " + SOAPURL);
 
-
-        while (nameListener.isServiceFound()==false){
+        while (nameListener.isServiceFound() == false) {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
@@ -115,7 +116,7 @@ public class V2Impl implements IV2, Runnable {
             }
         }
 
-        while (webListener.isServiceFound()==false){
+        while (webListener.isServiceFound() == false) {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
@@ -134,8 +135,7 @@ public class V2Impl implements IV2, Runnable {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        System.out.println("InformationServer on "+infoWsdl);
-
+        System.out.println("InformationServer on " + infoWsdl);
     }
 
     @Activate
@@ -148,21 +148,17 @@ public class V2Impl implements IV2, Runnable {
         System.out.println("V2 shutting down ...");
     }
 
-
-    public ArrayList<Position> getRouteDummy(){
+    public ArrayList<Position> getRouteDummy() {
         ArrayList<Position> positions = new ArrayList<>();
 
-
-        positions.add(new Position(	49.303717, 9.002668));
-        positions.add(new Position(	49.308762, 9.001426));
-        positions.add(new Position(	49.320000,9.084893));
+        positions.add(new Position(49.303717, 9.002668));
+        positions.add(new Position(49.308762, 9.001426));
+        positions.add(new Position(49.320000, 9.084893));
 
         return positions;
-
     }
 
-
-    public ArrayList<Position> getRoutePositions(){
+    public ArrayList<Position> getRoutePositions() {
 
         JsonParser parser = new JsonParser();
 
@@ -176,10 +172,9 @@ public class V2Impl implements IV2, Runnable {
             JsonObject geometry = route.get(0).getAsJsonObject().get("geometry").getAsJsonObject();
             JsonArray coordinates = geometry.get("coordinates").getAsJsonArray();
 
-
             ArrayList<Position> positions = new ArrayList<>();
 
-            for (int i = 0; i<coordinates.size();i++) {
+            for (int i = 0; i < coordinates.size(); i++) {
 
                 JsonArray coord = coordinates.get(i).getAsJsonArray();
                 positions.add(new Position(Double.parseDouble(coord.get(0).getAsString()), Double.parseDouble(coord.get(1).getAsString())));
@@ -196,8 +191,8 @@ public class V2Impl implements IV2, Runnable {
     public String readUrl() throws IOException {
         BufferedReader reader = null;
         String urlString = "http://141.72.191.30:5000/route/v1/driving/"
-                + origin.longitude + "," + origin.latitude + ";" + destination.longitude + "," + destination.latitude +
-                "?steps=true&alternatives=true&geometries=geojson";
+                           + origin.longitude + "," + origin.latitude + ";" + destination.longitude + "," + destination.latitude +
+                           "?steps=true&alternatives=true&geometries=geojson";
         System.out.println(urlString);
         try {
             URL url = new URL(urlString);
@@ -205,16 +200,17 @@ public class V2Impl implements IV2, Runnable {
             StringBuffer buffer = new StringBuffer();
             int read;
             char[] chars = new char[1024];
-            while ((read = reader.read(chars)) != -1)
+            while ((read = reader.read(chars)) != -1) {
                 buffer.append(chars, 0, read);
+            }
 
             return buffer.toString();
         } finally {
-            if (reader != null)
+            if (reader != null) {
                 reader.close();
+            }
         }
     }
-
 
     @WebMethod
     public Position getDestination() {
@@ -258,7 +254,7 @@ public class V2Impl implements IV2, Runnable {
     public void calculateDirection(Position from, Position to) {
 
         Position delta = new Position();
-        delta.latitude = to.latitude-from.latitude;
+        delta.latitude = to.latitude - from.latitude;
         delta.longitude = to.longitude - from.longitude;
         direction.latitude = delta.latitude;
         direction.longitude = delta.longitude;
@@ -273,21 +269,20 @@ public class V2Impl implements IV2, Runnable {
 
         while (currentPosition != destination) {
             try {
-                while (routePositions.size()>nextRoutePositionIndex && currentPosition.getLongitude() != this.routePositions.get(nextRoutePositionIndex).getLongitude() && currentPosition.getLatitude() != this.routePositions.get(nextRoutePositionIndex).getLatitude()) {
+                while (routePositions.size() > nextRoutePositionIndex && currentPosition.getLongitude() != this.routePositions.get(nextRoutePositionIndex).getLongitude() && currentPosition.getLatitude() != this.routePositions.get(nextRoutePositionIndex).getLatitude()) {
                     Thread.sleep(TIMEOUT);
-
 
                     publishPosition();
                     //diceBraking();
                     properBraking();
                     accelerate();
-                    calculateDirection(currentPosition,this.routePositions.get(nextRoutePositionIndex));
-                     currentPosition = drive(
-                            currentPosition.getLatitude(), currentPosition.getLongitude(),
-                            this.routePositions.get(nextRoutePositionIndex).getLatitude(), this.routePositions.get(nextRoutePositionIndex).getLongitude()
-                    );
+                    calculateDirection(currentPosition, this.routePositions.get(nextRoutePositionIndex));
+                    currentPosition = drive(
+                        currentPosition.getLatitude(), currentPosition.getLongitude(),
+                        this.routePositions.get(nextRoutePositionIndex).getLatitude(), this.routePositions.get(nextRoutePositionIndex).getLongitude()
+                                           );
 
-                    System.out.println("id: "+ id +" Pos: "+currentPosition.latitude+"|"+currentPosition.longitude);
+                    System.out.println("id: " + id + " Pos: " + currentPosition.latitude + "|" + currentPosition.longitude);
                 }
                 nextRoutePositionIndex++;
             } catch (InterruptedException exc) {
@@ -295,7 +290,6 @@ public class V2Impl implements IV2, Runnable {
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
-
         }
 
         try {
@@ -314,12 +308,12 @@ public class V2Impl implements IV2, Runnable {
     private void properBraking() throws MalformedURLException {
         ArrayList<V2Info> v2InfoArrayList = getNeighboursFromInfo(infoWsdl);
         for (V2Info v2Info :
-                v2InfoArrayList) {
+            v2InfoArrayList) {
             if (1000 < distance(
-                    v2Info.position.latitude,
-                    v2Info.position.longitude,
-                    currentPosition.latitude,
-                    currentPosition.longitude)
+                v2Info.position.latitude,
+                v2Info.position.longitude,
+                currentPosition.latitude,
+                currentPosition.longitude)
             ) {
                 V2SOAP v2SOAP = new V2SOAP(v2Info.SOAPURL);
                 v2SOAP.reduceSpeed();
@@ -336,25 +330,22 @@ public class V2Impl implements IV2, Runnable {
         double distance = distance(x1, y1, x2, y2);
         double distanceV2CanDrive = 100 / 3.6;
         Position resultingVector = new Position();
-        resultingVector.latitude = x2-x1;
-        resultingVector.longitude = y2-y1;
+        resultingVector.latitude = x2 - x1;
+        resultingVector.longitude = y2 - y1;
 
-        if(distance-distanceV2CanDrive>0){
+        if (distance - distanceV2CanDrive > 0) {
 
-            double factor = 1 - (distance-distanceV2CanDrive)/(distance); //Prozentual way made to next checkpoint
+            double factor = 1 - (distance - distanceV2CanDrive) / (distance); //Prozentual way made to next checkpoint
 
             Position newPosition = new Position();
-            newPosition.latitude = x1+resultingVector.latitude*factor;
-            newPosition.longitude = y1+resultingVector.longitude*factor;
+            newPosition.latitude = x1 + resultingVector.latitude * factor;
+            newPosition.longitude = y1 + resultingVector.longitude * factor;
 
             return newPosition;
-
-        }else{
-            return new Position(y2,x2);
+        } else {
+            return new Position(y2, x2);
         }
-
     }
-
 
     public static double distance(double lat1, double lon1, double lat2, double lon2) {
 
@@ -362,8 +353,8 @@ public class V2Impl implements IV2, Runnable {
         double latDistance = Math.toRadians(lat2 - lat1);
         double lonDistance = Math.toRadians(lon2 - lon1);
         double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+                   + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                     * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double distance = R * c * 1000; // convert to meters
         distance = Math.pow(distance, 2);
@@ -388,7 +379,6 @@ public class V2Impl implements IV2, Runnable {
         return new ArrayList<>();
     }
 
-
     private NameServerSOAP nameServerSOAP;
 
     //GET URL TO INFOSERVIE @PARAM url of nameservice and current position
@@ -396,7 +386,6 @@ public class V2Impl implements IV2, Runnable {
         nameServerSOAP = new NameServerSOAP(wsdl);
         return nameServerSOAP.getInfoServer(position);
     }
-
 
     //Publish position to @Param url to Inforservice return false => get new Infoservice
     public boolean publishPositionToInfoserver(String wsdl) throws MalformedURLException {
@@ -420,8 +409,7 @@ public class V2Impl implements IV2, Runnable {
         }
     }
 
-    private void publishFinished() throws MalformedURLException{
+    private void publishFinished() throws MalformedURLException {
         informationSOAP.receiveFinished(getV2Information());
     }
-
 }

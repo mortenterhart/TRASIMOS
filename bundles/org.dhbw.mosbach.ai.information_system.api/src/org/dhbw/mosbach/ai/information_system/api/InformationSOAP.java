@@ -18,12 +18,11 @@ public class InformationSOAP implements IInformationSystem {
 
         //CREATE KLIENTÉL
         System.out.println(urlToInformationSystem);
-        URL wsdlUrl =  new URL(urlToInformationSystem+"?wsdl");
-        QName qname = new QName(Configuration.InfoSystem_NameSpace,Configuration.InfoSystem_Local_Part);
+        URL wsdlUrl = new URL(urlToInformationSystem + "?wsdl");
+        QName qname = new QName(Configuration.InfoSystem_NameSpace, Configuration.InfoSystem_Local_Part);
         Service service = Service.create(wsdlUrl, qname);
-        informationSystem  = service.getPort(IInformationSystem.class);
+        informationSystem = service.getPort(IInformationSystem.class);
     }
-
 
     @Override
     public boolean receivePosition(V2Info v2Info) {
@@ -37,7 +36,7 @@ public class InformationSOAP implements IInformationSystem {
 
     @Override
     public ArrayList<V2Info> getNeighboursRemote(Position position, double radius) {
-        return informationSystem.getNeighboursRemote(position,radius);
+        return informationSystem.getNeighboursRemote(position, radius);
     }
 
     @Override

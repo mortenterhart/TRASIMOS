@@ -11,17 +11,15 @@ public class RadioSOAP implements IRadio {
 
     public RadioSOAP(String radioURL) throws MalformedURLException {
 
-        URL wsdlUrl = new URL(radioURL+"?wsdl");
-        System.out.println("Try To register nameService on: "+wsdlUrl.toString());
-        QName qname = new QName("http://provider.radio.ai.mosbach.dhbw.org/","RegisterServiceService");
+        URL wsdlUrl = new URL(radioURL + "?wsdl");
+        System.out.println("Try To register nameService on: " + wsdlUrl.toString());
+        QName qname = new QName("http://provider.radio.ai.mosbach.dhbw.org/", "RegisterServiceService");
         Service service = Service.create(wsdlUrl, qname);
         radio = service.getPort(IRadio.class);
     }
 
-
-
     @Override
     public void registerServiceAccess(String url, String serviceTyp) {
-        radio.registerServiceAccess(serviceTyp,url);
+        radio.registerServiceAccess(serviceTyp, url);
     }
 }

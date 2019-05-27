@@ -14,5 +14,4 @@ public class Activator implements BundleActivator {
     public void stop(BundleContext arg0) throws Exception {
         System.out.println("Base bundle stopping");
     }
-
 }

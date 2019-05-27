@@ -1,6 +1,5 @@
 package org.dhbw.mosbach.ai.radio.provider;
 
-
 import org.dhbw.mosbach.ai.base.Radio.ServiceConverter;
 import org.dhbw.mosbach.ai.base.Radio.ServiceInformation;
 
@@ -9,8 +8,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
-public class BroadcastPublisher implements Runnable{
-
+public class BroadcastPublisher implements Runnable {
 
     String ContentType;
     String multiCastAddress;
@@ -20,10 +18,10 @@ public class BroadcastPublisher implements Runnable{
     MulticastSocket s;
     int DelayInMs;
 
-    private volatile boolean stop=false;
+    private volatile boolean stop = false;
 
-    public void stop(){
-        this.stop=true;
+    public void stop() {
+        this.stop = true;
     }
 
     public BroadcastPublisher(String multiCastAddress, int multiCastPort, ServiceInformation serviceInformation, String ContentType, int DelayInMs) throws IOException {
@@ -43,7 +41,7 @@ public class BroadcastPublisher implements Runnable{
     @Override
     public void run() {
 
-        while (stop==false) {
+        while (stop == false) {
             try {
                 Thread.sleep(DelayInMs);
                 Thread.sleep(5000);
@@ -61,14 +59,14 @@ public class BroadcastPublisher implements Runnable{
         //Prepare Data
         byte[] data = ServiceConverter.convertServiceInformationToByte(serviceInformation);
 
-        if (serviceInformation.urls.size()>0)
-        System.out.println(serviceInformation.serviceTyp+" : "+serviceInformation.urls.get(0));
+        if (serviceInformation.urls.size() > 0) {
+            System.out.println(serviceInformation.serviceTyp + " : " + serviceInformation.urls.get(0));
+        }
         //Send data
         s.send(new DatagramPacket(data, data.length, group, multiCastPort));
     }
 
-    public void setMessage(ServiceInformation serviceInformation){
+    public void setMessage(ServiceInformation serviceInformation) {
         this.serviceInformation = serviceInformation;
     }
-
 }
