@@ -18,6 +18,7 @@ import org.osgi.service.component.annotations.Deactivate;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
+import javax.naming.Name;
 import javax.xml.ws.Endpoint;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,7 +38,7 @@ public class V2Impl implements IV2, Runnable {
     static class Route{
         private ArrayList<Position> getRouteDummy;
     }
-    private long id;
+    private static volatile long id;
     private Position origin;
     private Position destination;
     private volatile Position currentPosition;
@@ -69,6 +70,8 @@ public class V2Impl implements IV2, Runnable {
         this.maxVelocity = maxVelocity;
         origin = new Position(originLongitude, originLatitude);
         destination = new Position(destinationLongitude, destinationLatitude);
+        routePositions= getRoutePositions();
+
 
         //TODO REPLACE WENN DER SCHEiß SERVER WIEDER UP is
         routePositions = getRouteDummy();
@@ -114,7 +117,7 @@ public class V2Impl implements IV2, Runnable {
                 e.printStackTrace();
             }
         }
-
+/*
         while (webListener.isServiceFound()==false){
             try {
                 Thread.sleep(50);
@@ -122,13 +125,16 @@ public class V2Impl implements IV2, Runnable {
                 e.printStackTrace();
             }
         }
+        */
 
         try {
 
+            /*
             String webserverURL = webListener.getServiceURLs().get(0);
             webserverSOAP = new WebserverSOAP(webserverURL);
-
+*/
             String nameServerURL = nameListener.getServiceURLs().get(0);
+            nameServerSOAP = new NameServerSOAP(nameServerURL);
             infoWsdl = getInformationService(nameServerURL, currentPosition);
             informationSOAP = new InformationSOAP(infoWsdl);
         } catch (MalformedURLException e) {
@@ -164,38 +170,38 @@ public class V2Impl implements IV2, Runnable {
 
     public ArrayList<Position> getRoutePositions(){
 
-        JsonParser parser = new JsonParser();
-
-        String json = null;
         try {
-            json = readUrl();
-            JsonElement jsonObject = parser.parse(json);
-            JsonObject details = jsonObject.getAsJsonObject();
+            JsonParser parser = new JsonParser();
 
-            JsonArray route = details.get("routes").getAsJsonArray();
-            JsonObject geometry = route.get(0).getAsJsonObject().get("geometry").getAsJsonObject();
-            JsonArray coordinates = geometry.get("coordinates").getAsJsonArray();
+            String json = null;
+                json = readUrl();
+                JsonElement jsonObject = parser.parse(json);
+                JsonObject details = jsonObject.getAsJsonObject();
+
+                JsonArray route = details.get("routes").getAsJsonArray();
+                JsonObject geometry = route.get(0).getAsJsonObject().get("geometry").getAsJsonObject();
+                JsonArray coordinates = geometry.get("coordinates").getAsJsonArray();
 
 
-            ArrayList<Position> positions = new ArrayList<>();
+                ArrayList<Position> positions = new ArrayList<>();
 
-            for (int i = 0; i<coordinates.size();i++) {
+                for (int i = 0; i < coordinates.size(); i++) {
 
-                JsonArray coord = coordinates.get(i).getAsJsonArray();
-                positions.add(new Position(Double.parseDouble(coord.get(0).getAsString()), Double.parseDouble(coord.get(1).getAsString())));
-            }
+                    JsonArray coord = coordinates.get(i).getAsJsonArray();
+                    positions.add(new Position(Double.parseDouble(coord.get(0).getAsString()), Double.parseDouble(coord.get(1).getAsString())));
+                }
 
-            return positions;
-        } catch (IOException e) {
-            e.printStackTrace();
+                return positions;
+
+        }catch (Exception exp){
+            System.out.println("ROUTE SERVICE DOWN --");
+            return getRouteDummy();
         }
-
-        return new ArrayList<>();
     }
 
     public String readUrl() throws IOException {
         BufferedReader reader = null;
-        String urlString = "http://141.72.191.30:5000/route/v1/driving/"
+        String urlString = "http://router.project-osrm.org/route/v1/driving/"
                 + origin.longitude + "," + origin.latitude + ";" + destination.longitude + "," + destination.latitude +
                 "?steps=true&alternatives=true&geometries=geojson";
         System.out.println(urlString);
@@ -393,7 +399,6 @@ public class V2Impl implements IV2, Runnable {
 
     //GET URL TO INFOSERVIE @PARAM url of nameservice and current position
     public String getInformationService(String wsdl, Position position) throws MalformedURLException {
-        nameServerSOAP = new NameServerSOAP(wsdl);
         return nameServerSOAP.getInfoServer(position);
     }
 
@@ -401,12 +406,12 @@ public class V2Impl implements IV2, Runnable {
     //Publish position to @Param url to Inforservice return false => get new Infoservice
     public boolean publishPositionToInfoserver(String wsdl) throws MalformedURLException {
         V2Info v2Info = getV2Information();
-        webserverSOAP.receivePosition(v2Info);
+       // webserverSOAP.receivePosition(v2Info);
         return informationSOAP.receivePosition(v2Info);
     }
 
     InformationSOAP informationSOAP;
-    WebserverSOAP webserverSOAP;
+  //   WebserverSOAP webserverSOAP;
 
     public ArrayList<V2Info> getNeighboursFromInfo(String wsdl) throws MalformedURLException {
         return informationSOAP.getNeighbours(getV2Information());
