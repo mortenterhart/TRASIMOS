@@ -4,6 +4,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -13,14 +15,11 @@ public class MapServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        /*InputStream fileStream = new FileInputStream("");
+        InputStream fileStream = new FileInputStream("/Users/mte/IdeaProjects/TRASIMOS_Team3/bundles/org.dhbw.mosbach.ai.webserver.provider/WEB-INF/index.html");
         byte[] content = fileStream.readAllBytes();
         fileStream.close();
         
-        response.getWriter().write(new String(content));*/
-
-        InputStream mapFile = request.getServletContext().getResourceAsStream("/WEB-INF/index.html");
-        System.out.println(mapFile);
+        response.getWriter().write(new String(content));
     }
 
     @Override

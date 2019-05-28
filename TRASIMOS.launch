@@ -10,6 +10,7 @@
     <booleanAttribute key="default" value="true"/>
     <booleanAttribute key="default_auto_start" value="true"/>
     <intAttribute key="default_start_level" value="4"/>
+    <stringAttribute key="deselected_workspace_plugins" value="org.dhbw.mosbach.ai.information_system.provider,org.dhbw.mosbach.ai.name_server.provider,org.dhbw.mosbach.ai.radio.provider"/>
     <booleanAttribute key="includeOptional" value="false"/>
     <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
         <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
@@ -25,5 +26,5 @@
     <booleanAttribute key="tracing" value="true"/>
     <booleanAttribute key="useCustomFeatures" value="false"/>
     <booleanAttribute key="useDefaultConfigArea" value="true"/>
-    <stringAttribute key="workspace_bundles" value="org.dhbw.mosbach.ai.base@1:default,org.dhbw.mosbach.ai.information_system.api@4:default,org.dhbw.mosbach.ai.information_system.provider@4:default,org.dhbw.mosbach.ai.name_server.api@3:default,org.dhbw.mosbach.ai.name_server.provider@3:default,org.dhbw.mosbach.ai.radio.api@2:default,org.dhbw.mosbach.ai.radio.provider@2:default,org.dhbw.mosbach.ai.v2.api@4:default,org.dhbw.mosbach.ai.v2.factory@4:default,org.dhbw.mosbach.ai.v2.provider@4:default,org.dhbw.mosbach.ai.webserver.api@5:default,org.dhbw.mosbach.ai.webserver.provider@5:default"/>
+    <stringAttribute key="workspace_bundles" value="org.dhbw.mosbach.ai.base@1:default,org.dhbw.mosbach.ai.information_system.api@default:default,org.dhbw.mosbach.ai.name_server.api@default:default,org.dhbw.mosbach.ai.radio.api@default:default,org.dhbw.mosbach.ai.v2.api@default:default,org.dhbw.mosbach.ai.v2.factory@default:default,org.dhbw.mosbach.ai.v2.provider@default:default,org.dhbw.mosbach.ai.webserver.api@5:default,org.dhbw.mosbach.ai.webserver.provider@5:default"/>
 </launchConfiguration>
