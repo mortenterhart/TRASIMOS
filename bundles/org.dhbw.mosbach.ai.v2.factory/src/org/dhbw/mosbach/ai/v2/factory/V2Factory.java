@@ -22,7 +22,6 @@ public class V2Factory implements IV2Factory {
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
         System.out.println("V2 Factory booting ...");
-
         FactoryService.startService();
     }
     
