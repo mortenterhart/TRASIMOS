@@ -23,5 +23,8 @@ Bundle-ClassPath: lib/cxf-rt-databinding-jaxb-3.3.2.jar,
  lib/org.osgi.annotation-6.0.0.jar,
  lib/rt-2.3.2.jar,
  bin/,
- lib/jaxb-api-2.3.1.jar
+ lib/jaxb-api-2.3.1.jar,
+ lib/streambuffer-1.5.3.jar,
+ lib/istack-commons-runtime-3.0.8.jar,
+ lib/jaxb-impl-2.3.2.jar
 Service-Component: OSGI-INF/name-server.xml

@@ -39,7 +39,6 @@ public class ServiceConverter {
             byte[] protocol = Arrays.copyOfRange(receivedBuffer, index + 8, index + length + 8);
             return convertByteToServiceInformation(protocol);
         }
-
     }
 
     public static byte[] convertServiceInformationToByte(ServiceInformation serviceInformation) {
@@ -73,7 +72,9 @@ public class ServiceConverter {
                     break;
                 }
             }
-            if (found) return i;
+            if (found) {
+                return i;
+            }
         }
         return -1;
     }
@@ -88,7 +89,6 @@ public class ServiceConverter {
 
             if (receivedData.length == length) {
 
-
                 //Get hash from byte 4-7
                 byte[] hashBytes = Arrays.copyOfRange(receivedData, 4, 8);
                 int hash = ByteBuffer.wrap(hashBytes).getInt();
@@ -102,7 +102,6 @@ public class ServiceConverter {
                     return g.fromJson(json, ServiceInformation.class);
                 }
             }
-
         }
 
         return null;

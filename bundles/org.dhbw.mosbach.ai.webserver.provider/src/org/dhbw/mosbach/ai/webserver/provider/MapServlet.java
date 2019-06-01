@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class MapServlet extends HttpServlet {
 
@@ -12,7 +13,14 @@ public class MapServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/index.html").forward(request, response);
+        /*InputStream fileStream = new FileInputStream("");
+        byte[] content = fileStream.readAllBytes();
+        fileStream.close();
+        
+        response.getWriter().write(new String(content));*/
+
+        InputStream mapFile = request.getServletContext().getResourceAsStream("/WEB-INF/index.html");
+        System.out.println(mapFile);
     }
 
     @Override

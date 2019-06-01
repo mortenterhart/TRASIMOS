@@ -23,7 +23,6 @@ public class InformationSOAP implements IInformationSystem {
         informationSystem = service.getPort(IInformationSystem.class);
     }
 
-
     @Override
     public boolean receivePosition(V2Info v2Info) {
         return informationSystem.receivePosition(v2Info);

@@ -7,13 +7,13 @@ import java.util.ArrayList;
 
 public class BroadcastConsumer implements Runnable, IBroadcastConsumer {
 
-    String multiCastAddress;
-    int multiCastPort;
+    private String multiCastAddress;
+    private int multiCastPort;
     private volatile boolean stop = false;
     private volatile boolean foundService = false;
 
-    volatile String serviceTyp = "";
-    volatile ArrayList<String> serviceURLS = new ArrayList<>();
+    private volatile String serviceTyp = "";
+    private volatile ArrayList<String> serviceURLS = new ArrayList<>();
 
     public BroadcastConsumer(String multiCastAddress, int multiCastPort) {
         this.multiCastAddress = multiCastAddress;
@@ -46,9 +46,8 @@ public class BroadcastConsumer implements Runnable, IBroadcastConsumer {
             MulticastSocket s = new MulticastSocket(multiCastPort);
             s.joinGroup(group);
 
-
             //Receive data
-            while (stop == false) {
+            while (!stop) {
                 //System.out.println("Wating for datagram to be received...");
 
                 //Create buffer
@@ -56,9 +55,7 @@ public class BroadcastConsumer implements Runnable, IBroadcastConsumer {
                 s.receive(new DatagramPacket(buffer, bufferSize, group, multiCastPort));
                 //  System.out.println("Datagram received!");
 
-
                 try {
-
 
                     ServiceInformation serviceInformation = ServiceConverter.getServiceInformation(buffer);
                     if (serviceInformation != null && serviceInformation.serviceTyp != null && serviceInformation.urls != null && serviceInformation.urls.size() > 0) {
@@ -69,12 +66,10 @@ public class BroadcastConsumer implements Runnable, IBroadcastConsumer {
                 } catch (Exception e) {
                     System.out.println("No object could be read from the received UDP datagram." + e);
                 }
-
             }
 
             s.leaveGroup(InetAddress.getByName(multiCastAddress));
             s.close();
-
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -83,5 +78,4 @@ public class BroadcastConsumer implements Runnable, IBroadcastConsumer {
     public boolean isServiceFound() {
         return foundService;
     }
-
 }

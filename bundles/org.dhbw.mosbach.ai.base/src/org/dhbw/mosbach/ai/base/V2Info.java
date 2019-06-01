@@ -19,8 +19,6 @@ public class V2Info {
     @XmlElement
     public Position position;
 
-
     @XmlElement
     public Position direction;
-
 }
