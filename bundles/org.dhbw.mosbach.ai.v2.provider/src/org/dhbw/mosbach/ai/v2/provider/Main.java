@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class Main {
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         ArrayList<Position> positions = new ArrayList<>();
         Position pos1 = new Position(49.303717, 9.002668);

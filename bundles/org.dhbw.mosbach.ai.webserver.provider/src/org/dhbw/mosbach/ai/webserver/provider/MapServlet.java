@@ -13,14 +13,7 @@ public class MapServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        /*InputStream fileStream = new FileInputStream("");
-        byte[] content = fileStream.readAllBytes();
-        fileStream.close();
-        
-        response.getWriter().write(new String(content));*/
-
-        InputStream mapFile = request.getServletContext().getResourceAsStream("/WEB-INF/index.html");
-        System.out.println(mapFile);
+        request.getRequestDispatcher("/WEB-INF/index.html").forward(request, response);
     }
 
     @Override

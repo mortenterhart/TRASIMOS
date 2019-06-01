@@ -192,7 +192,7 @@ public class V2Impl implements IV2, Runnable {
         return id;
     }
 
-    public void calculateDirection(Position from, Position to) {
+    private void calculateDirection(Position from, Position to) {
 
         Position delta = new Position();
         delta.latitude = to.latitude - from.latitude;
@@ -201,7 +201,7 @@ public class V2Impl implements IV2, Runnable {
         direction.longitude = delta.longitude;
     }
 
-    public void startup() throws UnknownHostException {
+    private void startup() throws UnknownHostException {
         routePositions = getRoutePositions();
 
         origin = routePositions.get(0);
@@ -246,22 +246,8 @@ public class V2Impl implements IV2, Runnable {
                 e.printStackTrace();
             }
         }
-/*
-        while (webListener.isServiceFound()==false){
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        */
 
         try {
-
-            /*
-            String webserverURL = webListener.getServiceURLs().get(0);
-            webserverSOAP = new WebserverSOAP(webserverURL);
-*/
             String nameServerURL = nameListener.getServiceURLs().get(0);
             nameServerSOAP = new NameServerSOAP(nameServerURL);
             infoWsdl = getInformationService(nameServerURL, currentPosition);
