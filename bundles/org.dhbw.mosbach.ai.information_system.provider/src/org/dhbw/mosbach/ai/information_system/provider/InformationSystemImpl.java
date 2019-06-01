@@ -2,9 +2,9 @@ package org.dhbw.mosbach.ai.information_system.provider;
 
 import org.dhbw.mosbach.ai.base.MapChunk;
 import org.dhbw.mosbach.ai.base.Position;
-import org.dhbw.mosbach.ai.base.Radio.BroadcastConsumer;
-import org.dhbw.mosbach.ai.base.Radio.Configuration;
 import org.dhbw.mosbach.ai.base.V2Info;
+import org.dhbw.mosbach.ai.base.radio.BroadcastConsumer;
+import org.dhbw.mosbach.ai.base.radio.Configuration;
 import org.dhbw.mosbach.ai.information_system.api.IInformationSystem;
 import org.dhbw.mosbach.ai.information_system.api.IPublishPosition;
 import org.dhbw.mosbach.ai.name_server.api.NameServerSOAP;
@@ -25,16 +25,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.information_system.api.IInformationSystem")
-@Component(name = "information-system", service = { IInformationSystem.class, IPublishPosition.class }, immediate = true)
+@Component(name = "information-system", service = { IInformationSystem.class, IPublishPosition.class })
 public class InformationSystemImpl implements IPublishPosition, IInformationSystem {
 
-    public volatile static int id = 0;
+    public volatile int id = 0;
     private HashMap<Long, V2Info> vehiclesToObserve;
     private MapChunk areaBoundaries;
     private BroadcastConsumer nameListener;
     private String nameserviceURL;
     private String serviceURL;
-    private boolean activationDone = false;
+    private boolean actvationDone = false;
+
 
     private synchronized int getCurrID() {
         id++;
@@ -49,29 +50,31 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         startListener();
         try {
             serviceURL = "http://" + Inet4Address.getLocalHost().getHostAddress() + ":12002/" + id + "/InformationServer";
+
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        activationDone = true;
+        actvationDone = true;
 
-        while (nameListener.isServiceFound() == false) {
+        while (!nameListener.isServiceFound()) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+
         nameserviceURL = nameListener.getServiceURLs().get(0);
         try {
             NameServerSOAP nameServerSOAP = new NameServerSOAP(nameserviceURL);
             String bounds = nameServerSOAP.registerInfoServer(serviceURL);
 
-            setAreaBoundaries(new MapChunk(bounds));
+            convertBoundaries(bounds);
 
-            IInformationSystem impl = this;
-            Object implementor = impl;
+            Object implementor = this;
             String address = "http://0.0.0.0:12002/" + id + "/InformationServer";
             Endpoint.publish(address, implementor);
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -82,6 +85,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
     }
 
+
     public void startListener() {
         //Listen to Nameserver
         nameListener = new BroadcastConsumer(Configuration.NameService_multiCastAddress, Configuration.NameService_multiCastPort);
@@ -89,10 +93,12 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         nameListenerThread.start();
     }
 
+
     @Deactivate
     public void deactivate() {
         System.out.println("Information system shutting down ...");
     }
+
 
     @Override
     @WebMethod
@@ -109,6 +115,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
                 vehiclesToObserve.put(v2Info.V2id, v2Info);
                 return true;
             }
+
         } catch (Exception exp) {
             System.out.println("Failed receive Position");
         }
@@ -136,7 +143,6 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
                 if (isVehicleNearBoundary(v2Info.position, v2Info.speed)) {
                     // Vehicle to close at boundary
                     // TODO: Ask other servers
-
                 }
                 // Add neighbours in boundary
                 for (V2Info info : vehiclesToObserve.values()) {
@@ -149,6 +155,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         }
         return new ArrayList<>();
     }
+
 
     /**
      * get neighbours of position in a specific radius
@@ -183,6 +190,7 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
         System.out.println("FINISH RECEIVED ___ REMOVE CAR WITH ID " + v2Info.V2id);
     }
 
+
     @WebMethod
     @Override
     public void publish(Position position) {
@@ -191,8 +199,8 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
     private double distanceBetweenPositions(Position a, Position b) {
         return Math.sqrt(
-            (b.latitude - a.latitude) * (b.latitude - a.latitude) +
-            (b.longitude - a.longitude) * (b.longitude - a.longitude));
+                (b.latitude - a.latitude) * (b.latitude - a.latitude) +
+                        (b.longitude - a.longitude) * (b.longitude - a.longitude));
     }
 
     private boolean isVehicleKnown(long vehicleId) {
@@ -201,32 +209,64 @@ public class InformationSystemImpl implements IPublishPosition, IInformationSyst
 
     private boolean isVehicleInBoundary(Position position) {
         return position.longitude > areaBoundaries.getBottomLeft().longitude &&
-               position.longitude < areaBoundaries.getBottomRight().longitude &&
-               position.latitude < areaBoundaries.getTopLeft().latitude &&
-               position.latitude > areaBoundaries.getBottomLeft().latitude;
+                position.longitude < areaBoundaries.getBottomRight().longitude &&
+                position.latitude < areaBoundaries.getTopLeft().latitude &&
+                position.latitude > areaBoundaries.getBottomLeft().latitude;
     }
 
     private boolean isVehicleNearBoundary(Position position, double speed) {
         double stoppingDistance = calcStoppingDistance(speed);
         return position.latitude > (areaBoundaries.getTopLeft().latitude - stoppingDistance) ||
-               position.latitude < (areaBoundaries.getBottomLeft().latitude + stoppingDistance) ||
-               position.longitude < (areaBoundaries.getTopLeft().longitude + stoppingDistance) ||
-               position.longitude > (areaBoundaries.getTopRight().longitude - stoppingDistance);
+                position.latitude < (areaBoundaries.getBottomLeft().latitude + stoppingDistance) ||
+                position.longitude < (areaBoundaries.getTopLeft().longitude + stoppingDistance) ||
+                position.longitude > (areaBoundaries.getTopRight().longitude - stoppingDistance);
     }
 
     private double calcStoppingDistance(double speed) {
         if (speed != 0) {
             return (speed / 10 * 3) + (speed / 10 * speed / 10);
-        } else {
-            return 0;
-        }
+        } else return 0;
     }
 
     public MapChunk getAreaBoundaries() {
         return areaBoundaries;
     }
 
-    public void setAreaBoundaries(MapChunk areaBoundaries) {
+    private void setAreaBoundaries(MapChunk areaBoundaries) {
         this.areaBoundaries = areaBoundaries;
     }
+
+    private void convertBoundaries(String bounds) {
+        String[] positions = new String[4];
+        int actualPositionInArray = 0;
+        int lastSeparatorPosition = -1;
+        for (int i = 0; i < bounds.length(); i++) {
+            if (bounds.charAt(i) == ':') {
+                positions[actualPositionInArray] = bounds.substring(lastSeparatorPosition + 1, i - 1);
+                actualPositionInArray++;
+                lastSeparatorPosition = i;
+            }
+        }
+        positions[actualPositionInArray] = bounds.substring(lastSeparatorPosition + 1, bounds.length() - 1);
+
+        Position[] boundaryPositions = new Position[4];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < positions[i].length(); j++) {
+                if (positions[i].charAt(j) == ',') {
+                    String longitude = positions[i].substring(0, j - 1);
+                    String latitude = positions[i].substring(j + 1, positions[i].length() - 1);
+                    boundaryPositions[i] = new Position(Double.parseDouble(longitude), Double.parseDouble(latitude));
+                }
+            }
+        }
+
+        MapChunk mapChunk = new MapChunk();
+        mapChunk.setTopLeft(boundaryPositions[0]);
+        mapChunk.setTopRight(boundaryPositions[1]);
+        mapChunk.setBottomLeft(boundaryPositions[2]);
+        mapChunk.setBottomRight(boundaryPositions[3]);
+        setAreaBoundaries(mapChunk);
+    }
+
+
 }

@@ -2,8 +2,8 @@ package org.dhbw.mosbach.ai.name_server.provider;
 
 import org.dhbw.mosbach.ai.base.MapChunk;
 import org.dhbw.mosbach.ai.base.Position;
-import org.dhbw.mosbach.ai.base.Radio.BroadcastConsumer;
-import org.dhbw.mosbach.ai.base.Radio.Configuration;
+import org.dhbw.mosbach.ai.base.radio.BroadcastConsumer;
+import org.dhbw.mosbach.ai.base.radio.Configuration;
 import org.dhbw.mosbach.ai.name_server.api.INameServer;
 import org.dhbw.mosbach.ai.radio.api.RadioSOAP;
 import org.osgi.framework.BundleContext;
@@ -21,12 +21,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.name_server.api.INameServer")
 @Component(name = "name-server", service = INameServer.class, immediate = true)
 public class NameServerImpl implements INameServer {
 
-    Map<String, MapChunk> infoServers = Collections.synchronizedMap(new HashMap<>());
+    private Map<String, MapChunk> infoServers = Collections.synchronizedMap(new HashMap<>());
     private static MapChunk wholeMap;
 
     @Activate
@@ -47,7 +48,7 @@ public class NameServerImpl implements INameServer {
         Thread radioListenerThread = new Thread(radioListener);
         radioListenerThread.start();
 
-        while (radioListener.isServiceFound() == false) {
+        while (!radioListener.isServiceFound()) {
         }
 
         if (radioListener.getServiceURLs().size() > 0) {
@@ -59,13 +60,13 @@ public class NameServerImpl implements INameServer {
                 e.printStackTrace();
             }
 
-            try {
 
+            try {
                 String localIp = Inet4Address.getLocalHost().getHostAddress();
                 //Register nameService
                 String nameserviceURL = "http://" + localIp + ":9001/NameServer";
 
-                radioSOAP.registerServiceAccess(Configuration.NameService_ContentType, nameserviceURL);
+                Objects.requireNonNull(radioSOAP).registerServiceAccess(Configuration.NameService_ContentType, nameserviceURL);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -84,16 +85,17 @@ public class NameServerImpl implements INameServer {
         switch (infoServers.size()) {
             case 0:
                 boundaries = wholeMap.getTopLeft().toString() + ":" +
-                             wholeMap.getTopRight().toString() + ":" +
-                             wholeMap.getTopLeft().midPoint(wholeMap.getBottomLeft()) + ":" +
-                             wholeMap.getTopRight().midPoint(wholeMap.getBottomRight());
+                        wholeMap.getTopRight().toString() + ":" +
+                        wholeMap.getTopLeft().midPoint(wholeMap.getBottomLeft()) + ":" +
+                        wholeMap.getTopRight().midPoint(wholeMap.getBottomRight());
                 break;
             default:
                 boundaries = wholeMap.getTopLeft().midPoint(wholeMap.getBottomLeft()) + ":" +
-                             wholeMap.getTopRight().midPoint(wholeMap.getBottomRight()) + ":" +
-                             wholeMap.getBottomLeft() + ":" +
-                             wholeMap.getBottomRight();
+                        wholeMap.getTopRight().midPoint(wholeMap.getBottomRight()) + ":" +
+                        wholeMap.getBottomLeft() + ":" +
+                        wholeMap.getBottomRight();
                 break;
+
         }
 
         System.out.println("Regisered Info: " + url + " bounds: " + boundaries);
@@ -107,17 +109,17 @@ public class NameServerImpl implements INameServer {
     @Override
     @WebMethod
     public String getInfoServer(Position position) {
-
         String url = "";
-
         for (Entry<String, MapChunk> singleInfoServer : infoServers.entrySet()) {
-
             MapChunk mapChunk = singleInfoServer.getValue();
-
             if (mapChunk.isWithin(position)) {
                 url = singleInfoServer.getKey();
                 break;
             }
+        }
+
+        if (url.isEmpty()) {
+            return "OutOfMap";
         }
 
         return url;

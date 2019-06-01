@@ -1,12 +1,13 @@
 package org.dhbw.mosbach.ai.v2.provider;
 
+
 import org.dhbw.mosbach.ai.base.Position;
 
 import java.util.ArrayList;
 
 public class Main {
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         ArrayList<Position> positions = new ArrayList<>();
         Position pos1 = new Position(49.303717, 9.002668);
@@ -15,6 +16,7 @@ public class Main {
         double distance = distance(pos1.latitude, pos1.longitude, pos2.latitude, pos2.longitude);
         System.out.println(distance);
     }
+
 
     public static void testCar() {
 
@@ -30,6 +32,7 @@ public class Main {
 
         while (currPos.latitude != dest.latitude && currPos.longitude != dest.longitude) {
 
+
             while (currPos.latitude != route.get(routeIndex).latitude && currPos.longitude != route.get(routeIndex).longitude) {
 
                 System.out.println("------------------------------------");
@@ -37,12 +40,16 @@ public class Main {
                 System.out.println("Next pos" + route.get(routeIndex).latitude + "|" + route.get(routeIndex).longitude);
                 System.out.println("------------------------------------");
                 currPos = drive(currPos.latitude, currPos.longitude, route.get(routeIndex).latitude, route.get(routeIndex).longitude);
+
+
             }
 
             routeIndex++;
+
         }
 
         System.out.println("FINISHED");
+
     }
 
     public static Position drive(double x1, double y1, double x2, double y2) {
@@ -62,9 +69,11 @@ public class Main {
             newPosition.longitude = y1 + resultingVector.longitude * factor;
 
             return newPosition;
+
         } else {
             return new Position(y2, x2);
         }
+
     }
 
     public static double distance(double lat1, double lon1, double lat2, double lon2) {
@@ -74,8 +83,8 @@ public class Main {
         double latDistance = Math.toRadians(lat2 - lat1);
         double lonDistance = Math.toRadians(lon2 - lon1);
         double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                   + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                     * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double distance = R * c * 1000; // convert to meters
 
@@ -83,6 +92,7 @@ public class Main {
 
         return Math.sqrt(distance);
     }
+
 
     public static ArrayList<Position> getRouteDummy() {
         ArrayList<Position> positions = new ArrayList<>();
@@ -92,5 +102,7 @@ public class Main {
         positions.add(new Position(9.084893, 49.551546));
 
         return positions;
+
     }
+
 }

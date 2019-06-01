@@ -11,8 +11,7 @@ Export-Package: org.apache.cxf.endpoint.dynamic,
  org.apache.cxf.jaxb.io,
  org.dhbw.mosbach.ai.v2.api;version="1.0.0"
 Import-Package: org.dhbw.mosbach.ai.base;version="1.0.0",
- org.dhbw.mosbach.ai.base.Radio
-Bundle-ClassPath: lib/cxf-rt-databinding-jaxb-3.3.2.jar,
+ org.dhbw.mosbach.ai.base.radioBundle-ClassPath: lib/cxf-rt-databinding-jaxb-3.3.2.jar,
  lib/javax.jws-api-1.1.jar,
  lib/jaxws-api-2.3.1.jar,
  lib/org.osgi.annotation-6.0.0.jar,

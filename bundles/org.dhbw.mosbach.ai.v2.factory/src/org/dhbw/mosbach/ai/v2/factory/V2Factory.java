@@ -1,6 +1,6 @@
 package org.dhbw.mosbach.ai.v2.factory;
 
-import org.dhbw.mosbach.ai.base.Radio.Configuration;
+import org.dhbw.mosbach.ai.base.radio.Configuration;
 import org.dhbw.mosbach.ai.v2.provider.V2Impl;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -22,7 +22,6 @@ public class V2Factory implements IV2Factory {
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
         System.out.println("V2 Factory booting ...");
-
         FactoryService.startService();
     }
 
@@ -61,11 +60,11 @@ public class V2Factory implements IV2Factory {
         id += count;
     }
 
-    public double generateRandomLatitude() {
+    private double generateRandomLatitude() {
         return Math.random() * (Configuration.root11_mapppoint_lat - Configuration.root00_mappoint_lat) + Configuration.root00_mappoint_lat;
     }
 
-    public double generateRandomLongtitude() {
+    private double generateRandomLongtitude() {
         return Math.random() * (Configuration.root11_mapppoint_lang - Configuration.root00_mappoint_lang) + Configuration.root00_mappoint_lang;
     }
 }

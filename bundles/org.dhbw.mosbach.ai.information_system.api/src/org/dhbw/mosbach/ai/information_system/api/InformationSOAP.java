@@ -1,8 +1,8 @@
 package org.dhbw.mosbach.ai.information_system.api;
 
 import org.dhbw.mosbach.ai.base.Position;
-import org.dhbw.mosbach.ai.base.Radio.Configuration;
 import org.dhbw.mosbach.ai.base.V2Info;
+import org.dhbw.mosbach.ai.base.radio.Configuration;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -12,10 +12,9 @@ import java.util.ArrayList;
 
 public class InformationSOAP implements IInformationSystem {
 
-    IInformationSystem informationSystem;
+    private IInformationSystem informationSystem;
 
     public InformationSOAP(String urlToInformationSystem) throws MalformedURLException {
-
         //CREATE KLIENTÉL
         System.out.println(urlToInformationSystem);
         URL wsdlUrl = new URL(urlToInformationSystem + "?wsdl");

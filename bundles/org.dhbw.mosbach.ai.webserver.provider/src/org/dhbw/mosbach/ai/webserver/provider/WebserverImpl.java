@@ -1,9 +1,9 @@
 package org.dhbw.mosbach.ai.webserver.provider;
 
 import org.dhbw.mosbach.ai.base.Position;
-import org.dhbw.mosbach.ai.base.Radio.BroadcastConsumer;
-import org.dhbw.mosbach.ai.base.Radio.Configuration;
 import org.dhbw.mosbach.ai.base.V2Info;
+import org.dhbw.mosbach.ai.base.radio.BroadcastConsumer;
+import org.dhbw.mosbach.ai.base.radio.Configuration;
 import org.dhbw.mosbach.ai.radio.api.RadioSOAP;
 import org.dhbw.mosbach.ai.v2.factory.IV2Factory;
 import org.dhbw.mosbach.ai.webserver.api.IWebserver;
@@ -19,12 +19,7 @@ import org.osgi.service.http.NamespaceException;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.servlet.ServletException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
@@ -33,11 +28,7 @@ import javax.xml.ws.WebServiceException;
 import java.net.Inet4Address;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component(name = "webserver", service = IWebserver.class, immediate = true)
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.webserver.api.IWebserver")
@@ -47,13 +38,12 @@ public class WebserverImpl implements IWebserver {
     private Map<Long, Position> v2Positions = Collections.synchronizedMap(new HashMap<>());
     private IV2Factory v2Factory;
     private HttpService httpService;
-    private String servletPath = "/v2map";
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
         System.out.println("Webserver booting ...");
 
-        //registerServiceAtRadio();
+        registerServiceAtRadio();
 
         startService();
         startServlet();
@@ -62,8 +52,6 @@ public class WebserverImpl implements IWebserver {
     @Deactivate
     public void deactivate() {
         System.out.println("Webserver shutting down ...");
-
-        httpService.unregister(servletPath);
     }
 
     @Reference(unbind = "unbindHttpService")
@@ -79,7 +67,7 @@ public class WebserverImpl implements IWebserver {
     @WebMethod
     public void receivePosition(V2Info v2Info) {
         System.out.printf("Received position (%f, %f) from V2 %d%n", v2Info.position.latitude,
-                          v2Info.position.longitude, v2Info.V2id);
+                v2Info.position.longitude, v2Info.V2id);
         v2Positions.put(v2Info.V2id, v2Info.position);
     }
 
@@ -116,17 +104,13 @@ public class WebserverImpl implements IWebserver {
 
     private void startServlet() {
         try {
-            httpService.registerServlet(servletPath, new MapServlet(), null, null);
-            servletPath = "/map";
-            httpService.registerResources(servletPath, "WEB-INF", null);
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (NamespaceException e) {
+            httpService.registerServlet("/v2map", new MapServlet(), null, null);
+        } catch (ServletException | NamespaceException e) {
             e.printStackTrace();
         }
     }
 
-    public void registerServiceAtRadio() {
+    private void registerServiceAtRadio() {
         BroadcastConsumer radioListener = new BroadcastConsumer(Configuration.Radio_multiCastAddress, Configuration.Radio_multiCastPort);
         Thread radioListenerThread = new Thread(radioListener);
         radioListenerThread.start();
@@ -148,7 +132,7 @@ public class WebserverImpl implements IWebserver {
                 // Register webserverService
                 String webserviceURL = "http://" + localIp + ":9005/webserverService";
 
-                radioSOAP.registerServiceAccess(Configuration.Webserver_ContentType, webserviceURL);
+                Objects.requireNonNull(radioSOAP).registerServiceAccess(Configuration.Webserver_ContentType, webserviceURL);
             } catch (Exception e) {
                 e.printStackTrace();
             }
