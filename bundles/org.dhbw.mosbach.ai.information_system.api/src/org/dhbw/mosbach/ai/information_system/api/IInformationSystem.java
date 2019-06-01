@@ -8,7 +8,6 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import java.util.ArrayList;
 
-
 @WebService
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 public interface IInformationSystem {

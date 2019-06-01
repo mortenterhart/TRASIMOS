@@ -11,21 +11,21 @@ import javax.jws.soap.SOAPBinding;
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 public interface IV2 {
 
-   @WebMethod
-   V2Info getV2Information();
+    @WebMethod
+    V2Info getV2Information();
 
-   @WebMethod
-   Position getCurrentPosition();
+    @WebMethod
+    Position getCurrentPosition();
 
-   @WebMethod
-   Position getDestination();
+    @WebMethod
+    Position getDestination();
 
-   @WebMethod
-   Position getOrigin();
+    @WebMethod
+    Position getOrigin();
 
-   @WebMethod
-   void reduceSpeed();
+    @WebMethod
+    void reduceSpeed();
 
-   @WebMethod
-   long getId();
+    @WebMethod
+    long getId();
 }

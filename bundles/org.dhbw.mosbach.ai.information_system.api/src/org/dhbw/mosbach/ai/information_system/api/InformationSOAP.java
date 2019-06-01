@@ -1,8 +1,8 @@
 package org.dhbw.mosbach.ai.information_system.api;
 
 import org.dhbw.mosbach.ai.base.Position;
-import org.dhbw.mosbach.ai.base.Radio.Configuration;
 import org.dhbw.mosbach.ai.base.V2Info;
+import org.dhbw.mosbach.ai.base.radio.Configuration;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -12,16 +12,15 @@ import java.util.ArrayList;
 
 public class InformationSOAP implements IInformationSystem {
 
-    IInformationSystem informationSystem;
+    private IInformationSystem informationSystem;
 
     public InformationSOAP(String urlToInformationSystem) throws MalformedURLException {
-
         //CREATE KLIENTÉL
         System.out.println(urlToInformationSystem);
-        URL wsdlUrl =  new URL(urlToInformationSystem+"?wsdl");
-        QName qname = new QName(Configuration.InfoSystem_NameSpace,Configuration.InfoSystem_Local_Part);
+        URL wsdlUrl = new URL(urlToInformationSystem + "?wsdl");
+        QName qname = new QName(Configuration.InfoSystem_NameSpace, Configuration.InfoSystem_Local_Part);
         Service service = Service.create(wsdlUrl, qname);
-        informationSystem  = service.getPort(IInformationSystem.class);
+        informationSystem = service.getPort(IInformationSystem.class);
     }
 
 
@@ -37,7 +36,7 @@ public class InformationSOAP implements IInformationSystem {
 
     @Override
     public ArrayList<V2Info> getNeighboursRemote(Position position, double radius) {
-        return informationSystem.getNeighboursRemote(position,radius);
+        return informationSystem.getNeighboursRemote(position, radius);
     }
 
     @Override

@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0
 Automatic-Module-Name: org.dhbw.mosbach.ai.name_server.provider
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: org.dhbw.mosbach.ai.base;version="1.0.0",
- org.dhbw.mosbach.ai.base.Radio,
+ org.dhbw.mosbach.ai.base.radio,
  org.dhbw.mosbach.ai.name_server.api;version="1.0.0",
  org.dhbw.mosbach.ai.radio.api;version="1.0.0",
  org.osgi.service.component.annotations;version="1.3.0";resolution:=optional

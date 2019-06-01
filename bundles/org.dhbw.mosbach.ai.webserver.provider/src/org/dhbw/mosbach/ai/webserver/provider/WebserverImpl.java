@@ -2,8 +2,8 @@ package org.dhbw.mosbach.ai.webserver.provider;
 
 import org.dhbw.mosbach.ai.base.Position;
 import org.dhbw.mosbach.ai.base.V2Info;
-import org.dhbw.mosbach.ai.base.Radio.BroadcastConsumer;
-import org.dhbw.mosbach.ai.base.Radio.Configuration;
+import org.dhbw.mosbach.ai.base.radio.BroadcastConsumer;
+import org.dhbw.mosbach.ai.base.radio.Configuration;
 import org.dhbw.mosbach.ai.radio.api.RadioSOAP;
 import org.dhbw.mosbach.ai.v2.factory.IV2Factory;
 import org.dhbw.mosbach.ai.webserver.api.IWebserver;
@@ -19,26 +19,16 @@ import org.osgi.service.http.NamespaceException;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.servlet.ServletException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
-
 import java.net.Inet4Address;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component(name = "webserver", service = IWebserver.class, immediate = true)
 @WebService(endpointInterface = "org.dhbw.mosbach.ai.webserver.api.IWebserver")
@@ -115,9 +105,7 @@ public class WebserverImpl implements IWebserver {
     private void startServlet() {
         try {
             httpService.registerServlet("/v2map", new MapServlet(), null, null);
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (NamespaceException e) {
+        } catch (ServletException | NamespaceException e) {
             e.printStackTrace();
         }
     }
@@ -144,7 +132,7 @@ public class WebserverImpl implements IWebserver {
                 // Register webserverService
                 String webserviceURL = "http://" + localIp + ":9005/webserverService";
 
-                radioSOAP.registerServiceAccess(Configuration.Webserver_ContentType, webserviceURL);
+                Objects.requireNonNull(radioSOAP).registerServiceAccess(Configuration.Webserver_ContentType, webserviceURL);
             } catch (Exception e) {
                 e.printStackTrace();
             }

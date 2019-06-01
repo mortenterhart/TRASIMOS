@@ -1,6 +1,5 @@
 package org.dhbw.mosbach.ai.radio.api;
 
-
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;

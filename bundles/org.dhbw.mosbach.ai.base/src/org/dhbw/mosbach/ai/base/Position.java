@@ -8,11 +8,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Position {
 
     @XmlAttribute(required = true)
-    public double longitude=0;
+    public double longitude = 0;
     @XmlAttribute(required = true)
-    public double latitude=0;
+    public double latitude = 0;
 
-    public Position(){
+    public Position() {
 
     }
 
@@ -31,11 +31,11 @@ public class Position {
         return new Position(mLong, mLat);
     }
 
-    public double getLongitude(){
+    public double getLongitude() {
         return longitude;
     }
 
-    public double getLatitude(){
+    public double getLatitude() {
         return latitude;
     }
 }

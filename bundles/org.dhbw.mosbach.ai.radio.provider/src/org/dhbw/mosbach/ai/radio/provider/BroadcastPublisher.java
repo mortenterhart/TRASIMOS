@@ -1,29 +1,28 @@
 package org.dhbw.mosbach.ai.radio.provider;
 
 
-import org.dhbw.mosbach.ai.base.Radio.ServiceConverter;
-import org.dhbw.mosbach.ai.base.Radio.ServiceInformation;
+import org.dhbw.mosbach.ai.base.radio.ServiceConverter;
+import org.dhbw.mosbach.ai.base.radio.ServiceInformation;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
-public class BroadcastPublisher implements Runnable{
+public class BroadcastPublisher implements Runnable {
 
+    private String ContentType;
+    private String multiCastAddress;
+    private int multiCastPort;
+    private volatile ServiceInformation serviceInformation;
+    private InetAddress group;
+    private MulticastSocket s;
+    private int delayInMs;
 
-    String ContentType;
-    String multiCastAddress;
-    int multiCastPort;
-    volatile ServiceInformation serviceInformation;
-    InetAddress group;
-    MulticastSocket s;
-    int DelayInMs;
+    private volatile boolean stop = false;
 
-    private volatile boolean stop=false;
-
-    public void stop(){
-        this.stop=true;
+    public void stop() {
+        this.stop = true;
     }
 
     public BroadcastPublisher(String multiCastAddress, int multiCastPort, ServiceInformation serviceInformation, String ContentType, int DelayInMs) throws IOException {
@@ -31,7 +30,7 @@ public class BroadcastPublisher implements Runnable{
         this.multiCastPort = multiCastPort;
         this.serviceInformation = serviceInformation;
         this.ContentType = ContentType;
-        this.DelayInMs = DelayInMs;
+        this.delayInMs = DelayInMs;
 
         //Create Socket
         System.out.println("Create socket on address " + multiCastAddress + " and port " + multiCastPort + ".");
@@ -43,9 +42,9 @@ public class BroadcastPublisher implements Runnable{
     @Override
     public void run() {
 
-        while (stop==false) {
+        while (!stop) {
             try {
-                Thread.sleep(DelayInMs);
+                Thread.sleep(delayInMs);
                 Thread.sleep(5000);
                 sendMessage();
             } catch (Exception e) {
@@ -54,20 +53,20 @@ public class BroadcastPublisher implements Runnable{
         }
     }
 
-    public void sendMessage() throws IOException {
+    private void sendMessage() throws IOException {
         //Address
         //String multiCastAddress = "224.0.0.1";
         //final int multiCastPort = 52684;
         //Prepare Data
         byte[] data = ServiceConverter.convertServiceInformationToByte(serviceInformation);
 
-        if (serviceInformation.urls.size()>0)
-        System.out.println(serviceInformation.serviceTyp+" : "+serviceInformation.urls.get(0));
+        if (serviceInformation.urls.size() > 0)
+            System.out.println(serviceInformation.serviceTyp + " : " + serviceInformation.urls.get(0));
         //Send data
         s.send(new DatagramPacket(data, data.length, group, multiCastPort));
     }
 
-    public void setMessage(ServiceInformation serviceInformation){
+    public void setMessage(ServiceInformation serviceInformation) {
         this.serviceInformation = serviceInformation;
     }
 

@@ -1,20 +1,21 @@
-package org.dhbw.mosbach.ai.base.Radio;
+package org.dhbw.mosbach.ai.base.radio;
+
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.ArrayList;
 
-public class BroadcastConsumer implements Runnable, IBroadcastConsumer{
+public class BroadcastConsumer implements Runnable, IBroadcastConsumer {
 
     String multiCastAddress;
     int multiCastPort;
-    private volatile boolean stop=false;
+    private volatile boolean stop = false;
     private volatile boolean foundService = false;
 
-    volatile String serviceTyp="";
+    volatile String serviceTyp = "";
     volatile ArrayList<String> serviceURLS = new ArrayList<>();
 
-    public BroadcastConsumer( String multiCastAddress, int multiCastPort){
+    public BroadcastConsumer(String multiCastAddress, int multiCastPort) {
         this.multiCastAddress = multiCastAddress;
         this.multiCastPort = multiCastPort;
     }
@@ -29,8 +30,8 @@ public class BroadcastConsumer implements Runnable, IBroadcastConsumer{
         return serviceTyp;
     }
 
-    public void stop(){
-        this.stop=true;
+    public void stop() {
+        this.stop = true;
     }
 
     public void run() {
@@ -46,9 +47,8 @@ public class BroadcastConsumer implements Runnable, IBroadcastConsumer{
             s.joinGroup(group);
 
 
-
             //Receive data
-            while (stop==false) {
+            while (stop == false) {
                 //System.out.println("Wating for datagram to be received...");
 
                 //Create buffer
@@ -61,13 +61,13 @@ public class BroadcastConsumer implements Runnable, IBroadcastConsumer{
 
 
                     ServiceInformation serviceInformation = ServiceConverter.getServiceInformation(buffer);
-                    if (serviceInformation!=null && serviceInformation.serviceTyp != null && serviceInformation.urls !=null && serviceInformation.urls.size()>0){
+                    if (serviceInformation != null && serviceInformation.serviceTyp != null && serviceInformation.urls != null && serviceInformation.urls.size() > 0) {
                         this.serviceTyp = serviceInformation.serviceTyp;
                         this.serviceURLS = serviceInformation.urls;
                         foundService = true;
                     }
                 } catch (Exception e) {
-                    System.out.println("No object could be read from the received UDP datagram."+e);
+                    System.out.println("No object could be read from the received UDP datagram." + e);
                 }
 
             }
@@ -75,12 +75,12 @@ public class BroadcastConsumer implements Runnable, IBroadcastConsumer{
             s.leaveGroup(InetAddress.getByName(multiCastAddress));
             s.close();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
     }
 
-    public boolean isServiceFound(){
+    public boolean isServiceFound() {
         return foundService;
     }
 
