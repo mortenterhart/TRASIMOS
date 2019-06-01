@@ -27,13 +27,6 @@ public class FactoryService implements IV2Factory {
         } catch (WebServiceException exc) {
             exc.printStackTrace();
         }
-    }
 
-    public static void main(String[] args) {
-        startService();
-
-        while (true) {
-            ;
-        }
     }
 }

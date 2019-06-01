@@ -9,7 +9,7 @@ import java.net.URL;
 
 public class WebserverSOAP implements IWebserver {
 
-    IWebserver iWebserver;
+    private IWebserver iWebserver;
 
     public WebserverSOAP(String v2URL) throws MalformedURLException {
         //CREATE KLIENTÉL
@@ -17,6 +17,7 @@ public class WebserverSOAP implements IWebserver {
         QName qname = new QName("http://provider.webserver.ai.mosbach.dhbw.org/", "WebserverImplService");
         Service service = Service.create(wsdlUrl, qname);
         iWebserver = service.getPort(IWebserver.class);
+
     }
 
     @Override

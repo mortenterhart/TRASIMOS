@@ -1,4 +1,4 @@
-package org.dhbw.mosbach.ai.base.Radio;
+package org.dhbw.mosbach.ai.base.radio;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -7,13 +7,13 @@ import java.util.ArrayList;
 
 public class BroadcastConsumer implements Runnable, IBroadcastConsumer {
 
-    String multiCastAddress;
-    int multiCastPort;
+    private String multiCastAddress;
+    private int multiCastPort;
     private volatile boolean stop = false;
     private volatile boolean foundService = false;
 
-    volatile String serviceTyp = "";
-    volatile ArrayList<String> serviceURLS = new ArrayList<>();
+    private volatile String serviceTyp = "";
+    private volatile ArrayList<String> serviceURLS = new ArrayList<>();
 
     public BroadcastConsumer(String multiCastAddress, int multiCastPort) {
         this.multiCastAddress = multiCastAddress;
@@ -47,7 +47,7 @@ public class BroadcastConsumer implements Runnable, IBroadcastConsumer {
             s.joinGroup(group);
 
             //Receive data
-            while (stop == false) {
+            while (!stop) {
                 //System.out.println("Wating for datagram to be received...");
 
                 //Create buffer

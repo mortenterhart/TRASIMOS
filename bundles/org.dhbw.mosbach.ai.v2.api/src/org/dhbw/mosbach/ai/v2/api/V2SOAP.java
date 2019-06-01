@@ -1,8 +1,8 @@
 package org.dhbw.mosbach.ai.v2.api;
 
 import org.dhbw.mosbach.ai.base.Position;
-import org.dhbw.mosbach.ai.base.Radio.Configuration;
 import org.dhbw.mosbach.ai.base.V2Info;
+import org.dhbw.mosbach.ai.base.radio.Configuration;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -11,7 +11,7 @@ import java.net.URL;
 
 public class V2SOAP implements IV2 {
 
-    IV2 iv2;
+    private IV2 iv2;
 
     public V2SOAP(String v2URL) throws MalformedURLException {
         //CREATE KLIENTÉL

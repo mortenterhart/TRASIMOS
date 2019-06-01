@@ -1,4 +1,4 @@
-package org.dhbw.mosbach.ai.base.Radio;
+package org.dhbw.mosbach.ai.base.radio;
 
 import com.google.common.primitives.Bytes;
 import com.google.gson.Gson;

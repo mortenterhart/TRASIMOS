@@ -1,7 +1,7 @@
 package org.dhbw.mosbach.ai.radio.provider;
 
-import org.dhbw.mosbach.ai.base.Radio.Configuration;
-import org.dhbw.mosbach.ai.base.Radio.ServiceInformation;
+import org.dhbw.mosbach.ai.base.radio.Configuration;
+import org.dhbw.mosbach.ai.base.radio.ServiceInformation;
 import org.dhbw.mosbach.ai.radio.api.IRadio;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -14,32 +14,34 @@ import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.Map;
 
-@Component(name = "radio", service = IRadio.class, immediate = true)
+
+@Component(name = "radio", service = IRadio.class)
 public class Radio implements Runnable, IRegisterListener, IRadio {
+
+    private BroadcastPublisher radioPublish;
+    private Thread radioThread;
+    private BroadcastPublisher namePublish;
+    private Thread nameThread;
+    private BroadcastPublisher webserverPublish;
+    private Thread webserverThread;
+
+    private Thread threadRadio;
+
+    private RegisterService registerService;
+
+    private static volatile ArrayList<String> nameServices = new ArrayList<>();
+    private static volatile ArrayList<String> webServer = new ArrayList<>();
 
     @Activate
     public void activate(ComponentContext context, BundleContext bundleContext, Map<String, ?> properties) {
-        System.out.println("Radio booting ...");
+        System.out.println("V2 booting ...");
+
     }
 
     @Deactivate
     public void deactivate() {
-        System.out.println("Radio shutting down ...");
+        System.out.println("V2 shutting down ...");
     }
-
-    BroadcastPublisher radioPublish;
-    Thread radioThread;
-    BroadcastPublisher namePublish;
-    Thread nameThread;
-    BroadcastPublisher webserverPublish;
-    Thread webserverThread;
-
-    Thread threadRadio;
-
-    RegisterService registerService;
-
-    public static volatile ArrayList<String> nameServices = new ArrayList<>();
-    public static volatile ArrayList<String> webServer = new ArrayList<>();
 
     public Radio() {
 
@@ -55,30 +57,31 @@ public class Radio implements Runnable, IRegisterListener, IRadio {
 
         boolean initalized = false;
 
-        while (initalized == false) {
+        while (!initalized) {
 
             try {
+
 
                 String url = Configuration.general_https + "0.0.0.0" + Configuration.Radio_Registration_url;
                 registerService = new RegisterService();
                 registerService.addIRegisterListener(this);
                 Object implementor = registerService;
-                String address = url;
-                Endpoint.publish(address, implementor);
+                Endpoint.publish(url, implementor);
                 //Create SOAP Webservice for Registration of Service
                 //RegisterService.startService(this,Configuration.general_https+"0.0.0.0"+Configuration.Radio_Registration_url);
 
                 initalized = true;
+
             } catch (Exception exp) {
-                //exp.printStackTrace();
 
                 System.out.println("Failed to start SOAP register Service " + exp);
             }
+
         }
 
         initalized = false;
 
-        while (initalized == false) {
+        while (!initalized) {
 
             try {
 
@@ -92,17 +95,20 @@ public class Radio implements Runnable, IRegisterListener, IRadio {
                 radioThread.start();
 
                 initalized = true;
+
             } catch (Exception exp) {
 
                 System.out.println("Failed to start Nameservice UDP " + exp);
             }
+
         }
 
         initalized = false;
 
-        while (initalized == false) {
+        while (!initalized) {
 
             try {
+
 
                 ServiceInformation serviceInformationName = new ServiceInformation();
                 serviceInformationName.serviceTyp = Configuration.NameService_ContentType;
@@ -112,15 +118,17 @@ public class Radio implements Runnable, IRegisterListener, IRadio {
                 nameThread.start();
 
                 initalized = true;
+
             } catch (Exception exp) {
 
                 System.out.println("Failed to start Webserver UDP " + exp);
             }
+
         }
 
         initalized = false;
 
-        while (initalized == false) {
+        while (!initalized) {
 
             try {
 
@@ -133,10 +141,12 @@ public class Radio implements Runnable, IRegisterListener, IRadio {
 
                 initalized = true;
                 System.out.println("__________Started Broadcast Channels succesfull___________");
+
             } catch (Exception exp) {
 
                 System.out.println("Failed to start Radio " + exp);
             }
+
         }
 
         while (true) {
@@ -148,6 +158,7 @@ public class Radio implements Runnable, IRegisterListener, IRadio {
                 e.printStackTrace();
             }
         }
+
     }
 
     //GetTCP Messages via Oberserver Pattern
@@ -174,7 +185,7 @@ public class Radio implements Runnable, IRegisterListener, IRadio {
         this.webserverPublish.setMessage(serviceInformation);
     }
 
-    public void setNameServiceMessage() {
+    private void setNameServiceMessage() {
         ServiceInformation serviceInformation = new ServiceInformation();
         serviceInformation.serviceTyp = Configuration.NameService_ContentType;
         serviceInformation.urls.addAll(nameServices);

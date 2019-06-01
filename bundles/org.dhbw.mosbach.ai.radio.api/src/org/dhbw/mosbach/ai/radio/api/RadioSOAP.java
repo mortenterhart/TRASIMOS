@@ -7,7 +7,7 @@ import java.net.URL;
 
 public class RadioSOAP implements IRadio {
 
-    IRadio radio;
+    private IRadio radio;
 
     public RadioSOAP(String radioURL) throws MalformedURLException {
 
@@ -17,6 +17,7 @@ public class RadioSOAP implements IRadio {
         Service service = Service.create(wsdlUrl, qname);
         radio = service.getPort(IRadio.class);
     }
+
 
     @Override
     public void registerServiceAccess(String url, String serviceTyp) {

@@ -7,7 +7,7 @@ import java.net.URL;
 
 public class V2FactorySOAP implements IV2Factory {
 
-    IV2Factory factoryService;
+    private IV2Factory factoryService;
 
     public V2FactorySOAP(String V2FactoryUrl) throws MalformedURLException {
 

@@ -17,6 +17,7 @@ public class RegisterService implements IRadio, IRegisterProvider {
     public void registerServiceAccess(String serviceTyp, String url) {
         System.out.println("Service registered" + serviceTyp + ":" + url);
         notifyListener(serviceTyp, url);
+
     }
 
     @Override
@@ -35,8 +36,6 @@ public class RegisterService implements IRadio, IRegisterProvider {
     public static void startService(IRegisterListener registerListener, String url) {
         RegisterService registerService = new RegisterService();
         registerService.addIRegisterListener(registerListener);
-        Object implementor = registerService;
-        String address = url;
-        Endpoint.publish(address, implementor);
+        Endpoint.publish(url, registerService);
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" immediate="true" name="name-server">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate"
+               immediate="true" name="name-server">
     <service>
         <provide interface="org.dhbw.mosbach.ai.name_server.api.INameServer"/>
     </service>

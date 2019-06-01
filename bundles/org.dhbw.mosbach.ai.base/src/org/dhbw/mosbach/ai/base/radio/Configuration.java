@@ -1,7 +1,7 @@
-package org.dhbw.mosbach.ai.base.Radio;
+package org.dhbw.mosbach.ai.base.radio;
+
 
 public class Configuration {
-
     public static String general_https = "http://";
 
     public static String general_Seperation = ";";
@@ -12,11 +12,13 @@ public class Configuration {
     public static double root11_mapppoint_lang = 49.3000;
     public static double root11_mapppoint_lat = 9.5000;
 
+
     //Radio Multicast Group
     public static String Radio_multiCastAddress = "224.0.0.1";
     public static int Radio_multiCastPort = 50000;
     public static final String Radio_ContentType = "radio";
     public static final int Radio_Delay_Broadcast = 1000;
+
 
     //Nameservice Multicast Group
     public static String NameService_multiCastAddress = "224.0.0.2";
@@ -30,6 +32,7 @@ public class Configuration {
     public static int Webserver_multiCastPort = 50002;
     public static final String Webserver_ContentType = "webserver";
     public static final int Webserver_Delay_Broadcast = 200;
+
 
     //SOAP Access
 
@@ -56,4 +59,5 @@ public class Configuration {
     public static String V2SOAP = "/V2InfoService";
     public static int V2PortMin = 30000;
     public static int V2PortMax = 40000;
+
 }
