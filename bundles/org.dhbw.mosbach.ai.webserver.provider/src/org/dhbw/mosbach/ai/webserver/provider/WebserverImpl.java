@@ -110,7 +110,7 @@ public class WebserverImpl implements IWebserver {
         }
     }
 
-    public void registerServiceAtRadio() {
+    private void registerServiceAtRadio() {
         BroadcastConsumer radioListener = new BroadcastConsumer(Configuration.Radio_multiCastAddress, Configuration.Radio_multiCastPort);
         Thread radioListenerThread = new Thread(radioListener);
         radioListenerThread.start();
